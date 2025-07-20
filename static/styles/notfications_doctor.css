@@ -1,0 +1,1483 @@
+*{
+    padding: 0;
+    margin: 0;
+    box-sizing: border-box;
+}
+
+:root {
+  /* Base Colors */
+  --background-color: #f4f6f9;
+  --primary-color: #2980b9;
+  --secondary-color: #7f8c8d;
+  --button-color:#3498db;
+  --header-footer-color: #2c3e50;
+  --panel-bg-color: #34495e;
+  --alert-color: #e74c3c;
+  --box-background-color:white;
+  --normal-color:green;
+  /* Text Colors */
+  --text-primary: #2c3e50;
+  --text-secondary: #7f8c8d;
+  --text-on-dark: #ffffff;
+}
+
+.Critical{
+  color: var(--alert-color);
+  font-weight: bold;
+}
+.normal{
+  color: var(--normal-color);
+  font-weight: bold;
+}
+
+
+html body {
+    font-family: 'Roboto', sans-serif;
+    /* background: var(--box-background-color); Subtle gray background */
+}
+
+.header{
+      background-color: var(--header-footer-color);
+      /* position: fixed;
+      width: 100%; */
+}
+.header-container{
+    display: flex;
+    flex-direction: row;
+    /* max-width: 1100px; */
+    justify-content: space-between;
+    align-items: center;
+    /* margin: 0 auto; */
+    /* padding: 2rem; */
+    margin-inline: 1.2rem;
+    color: white;
+    gap: 2rem;
+}
+
+.logoside{
+ width: 8.5%;
+  height:6rem;
+   animation: slideDown 0.9s ease-in-out;
+  animation-iteration-count: 1;
+  animation-fill-mode: forwards; 
+}
+.logoside img{
+    width: 100%;
+    height: 100%;
+    
+}
+
+.main-nav {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between; 
+    align-items: center;
+    gap: 0.56rem;
+    animation: slideDown 1.2s ease-in-out;
+  animation-iteration-count: 1;
+  animation-fill-mode: forwards;
+}
+
+.main-nav a{
+    color: var(--text-on-dark);
+    text-decoration: none;
+    font-size: 1.1rem;
+    font-weight: 600;
+    padding: 0.7rem;
+    transition: all 0.2s ease-in 0s;
+}
+
+.main-nav a:hover{
+    background-color: var(--button-color);
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+    border-radius: 0.3rem;
+    color: var(--text-on-dark);
+}
+.main-nav .active{
+     background-color: var(--button-color);
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+    border-radius: 0.3rem;
+    color: var(--text-on-dark);
+    transition: backgorund-color ;
+}
+.active{
+    animation: fadein  0.3s ease-in;
+}
+
+#logout-a{
+     color: var(--text-on-dark);
+    text-decoration: none;
+    font-size: 1.1rem;
+    font-weight: 600;
+    padding: 0.7rem;
+    transition: all 0.2s ease-in 0s;
+}
+#logout-a:hover{
+    background-color: var(--button-color);
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+    border-radius: 0.3rem;
+    color: var(--text-on-dark);
+}
+.rightside{
+    display: flex;
+    flex-direction: row;
+    flex-direction: center;
+    align-items: center;
+    gap: 0.98rem;
+    animation: slideDown 1.4s ease-in-out;
+  animation-iteration-count: 1;
+  animation-fill-mode: forwards;
+    /* text-decoration: none; */
+}
+.profile-name{
+    text-decoration: none;
+    color: var(--text-on-dark);
+    font-size: 1.1rem;
+    font-weight: 600;
+}
+.notification{
+    color: var(--text-on-dark);
+    font-size: 1.1rem;
+    font-weight: 600;
+    text-decoration: none;
+    transition: all 0.3s ease-in;
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    gap: 0.23rem;
+}
+.m-notification , .badge{
+   display: none;
+}
+.notification img{
+    width: 1.3rem;
+    height: 1.3rem;
+}
+.notification:hover{
+   animation: bounce 3s ease-in;
+  animation-iteration-count: 1;
+    color: var(--primary-color);
+}
+
+.menu-button{
+    border: none;
+    background: none;
+    display: none;
+}
+
+.menu-icon{
+    height:3.5rem;
+    width:3.5rem;
+}
+
+
+/*  Main container  */
+
+.main-container{
+    margin: 0 auto;
+    padding: 2rem;
+  /* background-color: var(--background-color); */
+}
+.main-container h2{
+    text-align: center;
+     text-shadow: -3px 1px 6px rgba(0,0,0,0.2);
+     font-size: 1.8em;
+    color: #34495e;
+    font-weight: bold;
+    padding: 1.2rem;
+}
+
+ .notifications {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      gap: 20px;
+    }
+
+    .notification-card {
+      background-color: white;
+      padding: 20px;
+      border-left: 5px solid #007bff;
+      border-radius: 8px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+      transition: transform 0.2s ease;
+    }
+
+    .notification-card:hover {
+      transform: translateY(-5px);
+    }
+
+    .notification-card h3 {
+      font-size: 18px;
+      margin-bottom: 10px;
+      color: #333;
+    }
+
+    .notification-card p {
+      font-size: 14px;
+      color: #666;
+      margin-bottom: 10px;
+    }
+
+    .timestamp {
+      font-size: 12px;
+      color: #aaa;
+    }
+
+
+@media screen and (max-width:986px) {
+  .header{
+    position: relative;
+    width: 100%;
+  }
+   .header-container{
+        /* padding-inline: 0.8rem; */
+        padding-bottom: -5.3rem;
+        gap: 1.2rem;
+        justify-content: space-between;
+      }
+      .main-nav{
+        gap: 1.3rem;
+        display: none;
+      }
+
+      .notification, .profile{
+        display: none;
+      }
+
+      .m-notification{
+        /* display: block; */
+        /* width: 8rem;
+        height: 8rem; */
+        font-size: 1.4rem;
+        position: relative;
+        display: inline-block;
+      }
+       .badge{
+        position: absolute;
+        top: 17px;
+        right: 79.5px;
+        padding: 0.1px 4px;
+        border-radius: 50%;
+        background: red;
+        color: white;
+        display: block;
+      }
+
+        .menu-button{
+        display: block;
+        width: 4rem;
+        height: 3.5rem;
+    }
+    .menu-icon{
+      width: 100%;
+      height: 100%;
+    }
+
+    .logoside{
+      width: 5.2rem;
+      height: 5.2rem;
+      
+    }
+
+    .rightside{
+      gap: 0;
+    }
+    
+    #logout-a{
+        display: none;
+    }
+    .main-nav{
+        position: absolute;
+        top: 99%;
+        left: 0;
+        background-color: var(--panel-bg-color);
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        padding: 1rem;
+        flex-direction: column;
+        width: 100%;
+        display: none;
+        opacity: 0;
+        gap: 0.1rem;
+    }
+    .main-nav a{
+    font-size: 0.95rem;
+    font-weight: 400;
+}
+
+    .main-nav.show{
+        display: flex;
+        opacity: 1;
+       animation: slidedown 0.4s ease-in-out;
+
+    }
+    #logout-a{
+        display: none;
+    }
+    #home-a.show1{
+       animation: slidedown 0.4s ease-in-out;
+    }
+    #patient-a.show2{
+       animation: slidedown 0.6s ease-in-out;
+    }
+    #alert-a.show3{
+       animation: slidedown 0.8s ease-in-out;
+    }
+    #reports-a.show4{
+       animation: slidedown 1s ease-out;
+    }
+    #setting-a.show5{
+       animation: slidedown 1.2s ease-in-out;
+    }
+    .main-header{
+      margin-top: 5rem;
+    }
+
+
+    .form-section{
+      margin: 0 auto;
+     
+    }
+}
+
+@media screen and (max-width:500px){
+      
+     .logoside{
+      /* width: 0%; */
+      height: 4.5rem;
+    }
+    .badge{
+        position: absolute;
+        top: 12px;
+        right: 79.5px;
+        padding: 0.1px 4px;
+        border-radius: 50%;
+        background: red;
+        color: white;
+    
+      }
+      .main-nav{
+              top: 100%;
+
+          }
+
+    .form-toggle button { 
+      padding: 1.2rem;
+      border: none;
+      border-radius: 6px;
+      background-color: none;
+     color: var(--text-primary); 
+      font-size: 0.89rem;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+    
+    }
+
+/* @keyframes bounce {
+  0%, 20%, 50%, 80%, 100% {
+    transform: translateY(0);
+  }
+  40% {
+    transform: translateY(-25px);
+  }
+  60% {
+    transform: translateY(-15px);
+  }
+} */
+
+/* @keyframes slideDown {
+  0% {
+    transform: translateY(-100px);
+    opacity: 0;
+  }
+  100% {
+    transform: translateY(0);
+    opacity: 1;
+  }
+} */
+
+@keyframes slideDown1 {
+  0% {
+    transform: translateY(0);
+    opacity: 0;
+  }
+  100% {
+    transform: translateY(20px);
+    opacity: 1;
+  }
+} 
+
+@keyframes slidedown {
+
+    0%{
+        opacity: 0;
+        transform: translateY(-20px) ;
+    }
+
+    100%{
+        opacity: 1;
+        transform: translateY(0);
+    }
+    
+}
+
+@keyframes slideup {
+
+    0%{
+        opacity: 0;
+        transform: translateY(20px) ;
+    }
+
+    100%{
+        opacity: 1;
+        transform: translateY(0);
+    }
+    
+}
+@keyframes fadein {
+
+    0%{
+        opacity: 0;
+        transform: translate(1px);
+    }
+
+    100%{
+        opacity: 1;
+        transform: translate(1px);
+    }
+}
+
+
+:root {
+    --primary-color: #3b82f6; /* A vibrant blue */
+    --primary-dark: #2563eb;
+    --background-light: #f0f4f7; /* Light grey-blue background */
+    --sidebar-bg: #ffffff;
+    --card-bg: #fdfdff; /* Slightly off-white for cards */
+    --text-dark: #333d47; /* Darker grey for main text */
+    --text-medium: #556080; /* Muted blue-grey for secondary text */
+    --border-light: #e0e6ec; /* Light border color */
+    --shadow-light: rgba(0, 0, 0, 0.05);
+    --shadow-medium: rgba(0, 0, 0, 0.1);
+    --success-color: #28a745;
+    --error-color: #dc3545;
+
+    /* Notification specific colors */
+    --notification-new-patient: #28a745; /* Green */
+    --notification-appointment: #ffc107; /* Orange */
+    --notification-lab-result: #007bff; /* Blue */
+    --notification-system-alert: #dc3545; /* Red */
+    --notification-message-alert: #6f42c1; /* Purple */
+}
+
+/* Base Styles */
+*, *::before, *::after {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: 'Inter', sans-serif;
+    background-color: var(--background-light);
+    color: var(--text-dark);
+    line-height: 1.6;
+    overflow-x: hidden; /* Prevent horizontal scroll on small screens */
+}
+
+a {
+    text-decoration: none;
+    color: inherit;
+}
+
+/* Dashboard Layout */
+.dashboard {
+    display: flex;
+    min-height: 100vh;
+}
+
+/* Sidebar */
+.sidebar {
+    width: 260px;
+    background-color: var(--sidebar-bg);
+    border-right: 1px solid var(--border-light);
+    padding: 30px 20px;
+    position: fixed;
+    height: 100%;
+    box-shadow: 2px 0 10px var(--shadow-light);
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    transition: width 0.3s ease; /* For future collapse feature */
+    z-index: 1000; /* Ensure sidebar is above other content */
+}
+
+.sidebar-title {
+    font-size: 24px;
+    margin-bottom: 40px;
+    color: var(--primary-color);
+    font-weight: 700;
+    text-align: center;
+}
+
+.menu ul {
+    list-style: none;
+    padding: 0;
+}
+
+.menu-item {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    padding: 14px 18px;
+    margin-bottom: 10px;
+    border-radius: 8px;
+    color: var(--text-medium);
+    font-weight: 500;
+    transition: background-color 0.3s ease, color 0.3s ease, transform 0.2s ease;
+    cursor: pointer;
+}
+
+.menu-item i {
+    font-size: 18px;
+    color: var(--text-medium);
+    transition: color 0.3s ease;
+}
+
+.menu-item:hover {
+    background-color: #e1f0ff; /* Light blue */
+    color: var(--primary-color);
+    transform: translateX(5px);
+}
+
+.menu-item:hover i {
+    color: var(--primary-color);
+}
+
+.menu-item.active {
+    background-color: var(--primary-color);
+    color: white;
+    box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+}
+
+.menu-item.active i {
+    color: white;
+}
+
+.sidebar-footer {
+    text-align: center;
+    margin-top: auto; /* Pushes to the bottom */
+    padding-top: 20px;
+    border-top: 1px solid var(--border-light);
+    color: #999;
+    font-size: 0.85em;
+}
+
+
+/* Main Content Area */
+.main-content {
+    margin-left: 260px; /* Offset for sidebar */
+    padding: 30px;
+    flex: 1;
+    transition: margin-left 0.3s ease; /* For future collapse feature */
+}
+
+/* Top Bar */
+.top-bar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-bottom: 25px;
+    margin-bottom: 30px;
+    border-bottom: 1px solid var(--border-light);
+}
+
+.top-bar h1 {
+    font-size: 32px;
+    color: var(--text-dark);
+    font-weight: 700;
+}
+
+.profile-section {
+    display: flex;
+    align-items: center;
+    gap: 25px;
+}
+
+.notification-icon {
+    font-size: 22px;
+    color: var(--text-medium);
+    cursor: pointer;
+    transition: color 0.2s ease;
+}
+
+.notification-icon:hover {
+    color: var(--primary-color);
+}
+
+.user-avatar {
+    width: 45px;
+    height: 45px;
+    border-radius: 50%;
+    overflow: hidden;
+    border: 2px solid var(--primary-color);
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
+}
+
+.user-avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+
+/* Settings Container & Cards (Previous page styles, adjusted for consistency) */
+.settings-container, .notifications-container { /* Added .notifications-container */
+    background: var(--card-bg);
+    padding: 35px;
+    border-radius: 12px;
+    box-shadow: 0 8px 25px var(--shadow-light);
+}
+
+.settings-card {
+    background-color: #f7f9fb; /* Slightly different background for card */
+    border-radius: 10px;
+    padding: 30px;
+    margin-bottom: 35px;
+    border: 1px solid #e0e6ec; /* Light border */
+    box-shadow: inset 0 1px 5px rgba(0, 0, 0, 0.02); /* Very subtle inner shadow */
+}
+
+.card-title {
+    font-size: 20px;
+    color: var(--primary-dark);
+    margin-bottom: 25px;
+    padding-bottom: 15px;
+    border-bottom: 1px dashed var(--border-light);
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.card-title .icon-prefix {
+    color: var(--primary-color);
+    font-size: 22px;
+}
+
+/* Form Styling */
+.form-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 25px;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 0; /* Managed by grid gap */
+}
+
+.form-group label {
+    display: block;
+    font-weight: 600;
+    margin-bottom: 10px;
+    font-size: 0.95em;
+    color: var(--text-medium);
+}
+
+.form-group input,
+.form-group select,
+.form-group textarea {
+    width: 100%;
+    padding: 14px 16px;
+    border: 1px solid var(--border-light);
+    border-radius: 8px;
+    font-size: 1em;
+    color: var(--text-dark);
+    background-color: #ffffff;
+    box-shadow: inset 0 1px 4px rgba(0, 0, 0, 0.02);
+    transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.form-group input:focus,
+.form-group select:focus,
+.form-group textarea:focus {
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
+    outline: none;
+}
+
+.form-group textarea {
+    resize: vertical;
+    min-height: 90px;
+}
+
+/* Full-width elements in grid */
+.form-group.full-width {
+    grid-column: 1 / -1;
+}
+
+/* Checkbox specific styling */
+.checkbox-group {
+    flex-direction: row;
+    align-items: center;
+    padding-top: 10px; /* Align checkbox with other input fields */
+}
+
+.checkbox-group input[type="checkbox"] {
+    width: 20px;
+    height: 20px;
+    margin-right: 12px;
+    accent-color: var(--primary-color); /* Style the checkbox itself */
+    cursor: pointer;
+}
+
+.checkbox-group label {
+    margin-bottom: 0;
+    cursor: pointer;
+}
+
+.security-note {
+    background-color: #fff3cd; /* Light yellow for warning */
+    border-left: 4px solid #ffc107; /* Orange border */
+    padding: 15px;
+    border-radius: 6px;
+    color: #6a4f00;
+    font-size: 0.9em;
+    margin-bottom: 25px;
+}
+
+
+/* Buttons */
+.button-group {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+    margin-top: 40px;
+}
+
+.button-group button {
+    padding: 14px 30px;
+    border: none;
+    border-radius: 8px;
+    font-size: 1.1em;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4px 15px var(--shadow-light);
+}
+
+.save-btn {
+    background-color: var(--primary-color);
+    color: white;
+}
+
+.save-btn:hover {
+    background-color: var(--primary-dark);
+    box-shadow: 0 6px 20px rgba(59, 130, 246, 0.4);
+    transform: translateY(-2px);
+}
+
+.save-btn:active {
+    transform: translateY(0);
+    box-shadow: 0 2px 10px rgba(59, 130, 246, 0.2);
+}
+
+.cancel-btn {
+    background-color: #6c757d;
+    color: white;
+}
+
+.cancel-btn:hover {
+    background-color: #5a6268;
+    transform: translateY(-2px);
+}
+
+.cancel-btn:active {
+    transform: translateY(0);
+}
+
+/* Status Message */
+.status-message {
+    text-align: center;
+    margin-top: 25px;
+    padding: 12px;
+    border-radius: 6px;
+    font-weight: 500;
+    font-size: 0.95em;
+    opacity: 0; /* Hidden by default */
+    transition: opacity 0.3s ease;
+}
+
+.status-message.show {
+    opacity: 1;
+}
+
+.status-message.success {
+    background-color: #e6ffe6;
+    color: var(--success-color);
+    border: 1px solid var(--success-color);
+}
+
+.status-message.error {
+    background-color: #ffe6e6;
+    color: var(--error-color);
+    border: 1px solid var(--error-color);
+}
+
+/* Loading Spinner */
+.spinner {
+    border: 3px solid rgba(255, 255, 255, 0.3);
+    border-top: 3px solid #fff;
+    border-radius: 50%;
+    width: 20px;
+    height: 20px;
+    animation: spin 1s linear infinite;
+    margin-left: 10px;
+    display: inline-block; /* Make sure it's inline with text */
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+/* --- Patient Reports Page Specific Styles (integrated for consistency) --- */
+.container { /* General container for content not in dashboard */
+    max-width: 960px;
+    margin: 20px auto;
+    background-color: var(--sidebar-bg);
+    padding: 40px;
+    border-radius: 12px;
+    box-shadow: 0 8px 30px var(--shadow-light);
+}
+
+.nav-link { /* Generic nav link, adapted for the simple header in patient reports */
+    text-decoration: none;
+    color: var(--text-medium);
+    font-weight: 500;
+    padding: 8px 20px;
+    border-radius: 6px;
+    transition: all 0.3s ease;
+    margin: 0 10px;
+}
+
+.nav-link:hover {
+    background-color: #e1f0ff;
+    color: var(--primary-color);
+}
+
+.nav-link.active {
+    background-color: var(--primary-color);
+    color: #fff;
+    box-shadow: 0 2px 8px rgba(59, 130, 246, 0.2);
+}
+
+.input-section, .patient-list-section, .report-section {
+    padding: 30px;
+    border-radius: 10px;
+    background-color: var(--card-bg);
+    box-shadow: 0 4px 15px var(--shadow-light);
+    margin-bottom: 30px;
+    border: none;
+}
+
+#patientSelector {
+    padding: 12px;
+    border: 1px solid var(--border-light);
+    border-radius: 8px;
+    width: calc(100% - 220px);
+    max-width: 400px;
+    margin-right: 10px;
+    margin-bottom: 15px;
+    font-size: 1em;
+    background-color: #ffffff;
+}
+
+.report-section {
+    display: none;
+    padding: 35px;
+    border: 1px solid var(--border-light);
+    background-color: var(--sidebar-bg);
+    box-shadow: 0 4px 15px var(--shadow-light);
+}
+
+.report-header {
+    text-align: center;
+    margin-bottom: 25px;
+    padding-bottom: 15px;
+    border-bottom: 1px solid var(--border-light);
+    font-size: 0.95em;
+    color: var(--text-medium);
+}
+
+.report-header p strong {
+    color: var(--text-dark);
+}
+
+.report-details p {
+    margin-bottom: 12px;
+    line-height: 1.5;
+    font-size: 1.05em;
+}
+
+.report-details p strong {
+    color: var(--text-dark);
+    display: inline-block;
+    min-width: 140px;
+    vertical-align: top;
+}
+
+.report-content {
+    background-color: #f8f9fa;
+    padding: 15px;
+    border-left: 4px solid var(--primary-color);
+    border-radius: 6px;
+    margin-left: 20px;
+    white-space: pre-wrap;
+    font-size: 0.95em;
+    color: var(--text-medium);
+    box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.03);
+}
+
+/* --- NEW NOTIFICATION STYLES --- */
+.notifications-intro {
+    font-size: 1.1em;
+    color: var(--text-medium);
+    text-align: center;
+    margin-bottom: 30px;
+    padding-bottom: 20px;
+    border-bottom: 1px solid var(--border-light);
+}
+
+.notification-card {
+    display: flex;
+    align-items: flex-start; /* Align content to the top */
+    background-color: var(--sidebar-bg);
+    border-radius: 10px;
+    box-shadow: 0 4px 15px var(--shadow-light);
+    margin-bottom: 20px;
+    padding: 20px 25px;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    border-left: 5px solid var(--primary-color); /* Default border color */
+}
+
+.notification-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.08);
+}
+
+.notification-icon-wrapper {
+    flex-shrink: 0; /* Don't shrink icon */
+    width: 45px;
+    height: 45px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
+    color: white;
+    margin-right: 20px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+}
+
+/* Specific notification type colors */
+.notification-card.new-patient { border-left-color: var(--notification-new-patient); }
+.notification-card.new-patient .notification-icon-wrapper { background-color: var(--notification-new-patient); }
+
+.notification-card.appointment-reminder { border-left-color: var(--notification-appointment); }
+.notification-card.appointment-reminder .notification-icon-wrapper { background-color: var(--notification-appointment); }
+
+.notification-card.lab-result { border-left-color: var(--notification-lab-result); }
+.notification-card.lab-result .notification-icon-wrapper { background-color: var(--notification-lab-result); }
+
+.notification-card.system-alert { border-left-color: var(--notification-system-alert); }
+.notification-card.system-alert .notification-icon-wrapper { background-color: var(--notification-system-alert); }
+
+.notification-card.message-alert { border-left-color: var(--notification-message-alert); }
+.notification-card.message-alert .notification-icon-wrapper { background-color: var(--notification-message-alert); }
+
+
+.notification-content {
+    flex-grow: 1; /* Take remaining space */
+}
+
+.notification-title {
+    font-size: 1.15em;
+    font-weight: 600;
+    color: var(--text-dark);
+    margin-bottom: 5px;
+}
+
+.notification-text {
+    font-size: 0.95em;
+    color: var(--text-medium);
+    margin-bottom: 10px;
+}
+
+.notification-text strong {
+    font-weight: 600;
+    color: var(--text-dark);
+}
+
+.notification-time {
+    font-size: 0.85em;
+    color: #999;
+}
+
+.notification-actions {
+    flex-shrink: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-left: 20px; /* Space from content */
+}
+
+.action-btn {
+    padding: 8px 15px;
+    border: 1px solid var(--border-light);
+    border-radius: 6px;
+    background-color: #f0f4f7;
+    color: var(--text-medium);
+    font-size: 0.9em;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.action-btn:hover {
+    background-color: #e1e6ec;
+    border-color: #c0c7d2;
+}
+
+/* Specific action button colors */
+.action-btn.view-btn, .action-btn.review-btn, .action-btn.reply-btn {
+    background-color: var(--primary-color);
+    color: white;
+    border-color: var(--primary-color);
+}
+.action-btn.view-btn:hover, .action-btn.review-btn:hover, .action-btn.reply-btn:hover {
+    background-color: var(--primary-dark);
+    border-color: var(--primary-dark);
+}
+
+.action-btn.snooze-btn {
+    background-color: #ffc107;
+    color: #333;
+    border-color: #ffc107;
+}
+.action-btn.snooze-btn:hover {
+    background-color: #e0a800;
+    border-color: #e0a800;
+}
+
+.action-btn.dismiss-btn {
+    background-color: #dc3545;
+    color: white;
+    border-color: #dc3545;
+}
+.action-btn.dismiss-btn:hover {
+    background-color: #c82333;
+    border-color: #c82333;
+}
+
+.action-btn.mark-read-btn {
+    background-color: #e9ecef;
+    color: #6c757d;
+    border-color: #e9ecef;
+}
+.action-btn.mark-read-btn:hover {
+    background-color: #dae0e5;
+    border-color: #c6cdd2;
+}
+
+/* Responsive Adjustments */
+@media (max-width: 992px) {
+    .sidebar {
+        width: 220px;
+    }
+    .main-content {
+        margin-left: 220px;
+        padding: 20px;
+    }
+    .top-bar h1 {
+        font-size: 28px;
+    }
+    .form-grid {
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 20px;
+    }
+    .settings-container, .input-section, .patient-list-section, .report-section, .notifications-container {
+        padding: 25px;
+    }
+    .settings-card {
+        padding: 25px;
+    }
+    .button-group .button {
+        padding: 12px 25px;
+        font-size: 1em;
+    }
+    .notification-card {
+        flex-direction: column; /* Stack elements in notification card */
+        align-items: center;
+        text-align: center;
+        padding: 20px;
+    }
+    .notification-icon-wrapper {
+        margin-right: 0;
+        margin-bottom: 15px;
+    }
+    .notification-actions {
+        margin-left: 0;
+        margin-top: 20px;
+        flex-direction: row; /* Keep action buttons in a row */
+        flex-wrap: wrap;
+        justify-content: center;
+    }
+    .action-btn {
+        width: auto;
+        flex-grow: 1; /* Allow buttons to grow */
+        margin: 5px; /* Add some margin */
+    }
+}
+
+@media (max-width: 768px) {
+    .dashboard {
+        flex-direction: column; /* Stack sidebar and main content */
+    }
+    .sidebar {
+        position: relative; /* No longer fixed */
+        width: 100%;
+        height: auto;
+        border-right: none;
+        border-bottom: 1px solid var(--border-light);
+        padding: 20px;
+        box-shadow: 0 2px 5px var(--shadow-light);
+    }
+    .sidebar-title {
+        margin-bottom: 20px;
+    }
+    .menu ul {
+        display: flex; /* Make menu items horizontal */
+        flex-wrap: wrap;
+        justify-content: center;
+    }
+    .menu-item {
+        padding: 10px 15px;
+        margin: 5px;
+        font-size: 0.9em;
+        width: calc(50% - 10px); /* Two columns */
+        justify-content: center; /* Center content in item */
+    }
+    .menu-item i {
+        font-size: 16px;
+    }
+    .sidebar-footer {
+        display: none; /* Hide footer on small screens */
+    }
+    .main-content {
+        margin-left: 0; /* No offset from sidebar */
+        padding: 20px;
+    }
+    .top-bar {
+        flex-direction: column;
+        align-items: flex-start;
+        padding-bottom: 15px;
+        margin-bottom: 20px;
+    }
+    .top-bar h1 {
+        font-size: 26px;
+        margin-bottom: 10px;
+    }
+    .profile-section {
+        width: 100%;
+        justify-content: flex-end; /* Push icons to the right */
+        margin-top: 10px;
+    }
+    .form-grid {
+        grid-template-columns: 1fr; /* Stack all form groups */
+        gap: 15px;
+    }
+    .settings-container, .input-section, .patient-list-section, .report-section, .notifications-container {
+        padding: 20px;
+    }
+    .settings-card {
+        padding: 20px;
+    }
+    .button-group {
+        flex-direction: column; /* Stack buttons */
+        gap: 10px;
+    }
+    .button-group button {
+        width: 100%;
+        font-size: 1em;
+    }
+    #patientSelector {
+        width: 100%;
+        margin-right: 0;
+        margin-bottom: 15px;
+    }
+    .notification-title {
+        font-size: 1.05em;
+    }
+    .notification-text {
+        font-size: 0.9em;
+    }
+    .notification-actions {
+        flex-direction: column; /* Stack actions again if needed */
+        width: 100%;
+        gap: 10px;
+    }
+    .action-btn {
+        width: 100%;
+    }
+}
+
+@media (max-width: 480px) {
+    body {
+        padding: 10px;
+    }
+    .sidebar {
+        padding: 15px;
+    }
+    .sidebar-title {
+        font-size: 20px;
+        margin-bottom: 15px;
+    }
+    .menu-item {
+        padding: 8px 12px;
+        font-size: 0.85em;
+    }
+    .main-content {
+        padding: 15px;
+    }
+    .top-bar h1 {
+        font-size: 22px;
+    }
+    .profile-section {
+        gap: 15px;
+    }
+    .notification-icon {
+        font-size: 18px;
+    }
+    .user-avatar {
+        width: 40px;
+        height: 40px;
+    }
+    .settings-container, .input-section, .patient-list-section, .report-section, .notifications-container {
+        padding: 15px;
+    }
+    .settings-card {
+        padding: 15px;
+    }
+    .card-title {
+        font-size: 18px;
+    }
+    .card-title .icon-prefix {
+        font-size: 20px;
+    }
+    .form-group label {
+        font-size: 0.9em;
+    }
+    .form-group input, .form-group select, .form-group textarea {
+        padding: 10px 12px;
+        font-size: 0.9em;
+    }
+    .security-note {
+        padding: 10px;
+        font-size: 0.8em;
+    }
+    .button-group button {
+        padding: 10px 15px;
+        font-size: 0.95em;
+    }
+    .status-message {
+        font-size: 0.85em;
+        padding: 10px;
+    }
+}
+
+/* Print Specific Styles */
+@media print {
+    body {
+        margin: 0;
+        padding: 0;
+        background-color: white;
+        overflow-x: hidden;
+    }
+    .dashboard, .sidebar, .main-content {
+        display: block !important; /* Reset flex for print */
+        margin: 0 !important;
+        padding: 0 !important;
+        width: 100% !important;
+        height: auto !important;
+        position: static !important;
+        box-shadow: none !important;
+        border: none !important;
+    }
+    .top-bar, .menu, .sidebar-footer, .button-group, .status-message,
+    .input-section, .patient-list-section, .settings-card, .notifications-container { /* Hide all non-report elements EXCEPT report-section */
+        display: none !important;
+    }
+    .report-section { /* Ensure only report section is visible on patient report page */
+        display: block !important;
+        box-shadow: none !important;
+        border: none !important;
+        padding: 20px !important;
+        background-color: white !important;
+    }
+    /* If you want to print notifications specifically, you'd need another print media query for that page */
+    .notifications-container {
+        display: block !important; /* Only show notifications if printing THIS page */
+        box-shadow: none !important;
+        border: none !important;
+        padding: 20px !important;
+        background-color: white !important;
+    }
+    .notification-card {
+        border: 1px solid #ddd !important;
+        box-shadow: none !important;
+        margin-bottom: 15px !important;
+        padding: 15px !important;
+    }
+    .notification-actions {
+        display: none !important; /* Hide action buttons when printing notifications */
+    }
+
+
+    h1 {
+        text-align: left !important;
+        font-size: 24px !important;
+        margin-top: 20px !important;
+        margin-bottom: 20px !important;
+        border-bottom: 1px solid #ccc !important;
+        padding-bottom: 10px !important;
+    }
+    .report-header {
+        border-bottom: 1px solid #ccc !important;
+        padding-bottom: 10px !important;
+    }
+    .report-details p strong {
+        min-width: 100px !important;
+    }
+}
+
+.profile{
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    gap: 0.2rem;
+    text-decoration: none;
+}
+.profile-img{
+    width: 2.7rem;
+    height: 2.7rem;
+    border-radius: 9999px;
+    object-fit: cover;
+}
+
+/* --- Modern Doctor Notifications Styles --- */
+body {
+    background: #f4f7fa;
+    font-family: 'Segoe UI', Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+}
+
+.notifications-container {
+    max-width: 900px;
+    margin: 48px auto 0 auto;
+    background: #fff;
+    border-radius: 18px;
+    box-shadow: 0 8px 32px rgba(34,48,70,0.13);
+    padding: 48px 60px 40px 60px;
+}
+
+.notifications-container h1 {
+    font-size: 2.3rem;
+    font-weight: 800;
+    color: #223046;
+    margin-bottom: 28px;
+    text-align: left;
+}
+
+.notifications-list {
+    margin-top: 24px;
+}
+
+.notification-item {
+    background: #f7fafc;
+    border-radius: 14px;
+    box-shadow: 0 2px 12px rgba(52,152,219,0.10);
+    padding: 22px 28px;
+    margin-bottom: 22px;
+    transition: box-shadow 0.2s;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.notification-item.unread {
+    border-left: 6px solid #3498db;
+    background: #eaf4fb;
+}
+
+.notification-item h3 {
+    color: #3498db;
+    font-size: 1.18rem;
+    font-weight: 700;
+    margin-bottom: 4px;
+}
+
+.notification-item p {
+    color: #223046;
+    font-size: 1.05rem;
+    margin: 2px 0;
+}
+
+.mark-all-btn, .notification-action-btn {
+    min-width: 120px;
+    padding: 10px 0;
+    font-size: 1.08rem;
+    font-weight: 700;
+    background: linear-gradient(90deg, #3498db 0%, #6dd5fa 100%);
+    color: #fff;
+    border: none;
+    border-radius: 6px;
+    box-shadow: 0 2px 8px rgba(52,152,219,0.10);
+    cursor: pointer;
+    transition: background 0.2s, box-shadow 0.2s;
+    margin-bottom: 0;
+    margin-right: 12px;
+}
+.mark-all-btn:hover, .notification-action-btn:hover {
+    background: linear-gradient(90deg, #217dbb 0%, #3498db 100%);
+    box-shadow: 0 4px 16px rgba(52,152,219,0.18);
+}
+
+@media (max-width: 900px) {
+    .notifications-container {
+        padding: 24px 8px;
+    }
+    .notification-item {
+        padding: 14px 8px;
+    }
+}
+@media (max-width: 600px) {
+    .notifications-container {
+        padding: 8px 2px;
+    }
+    .notifications-container h1 {
+        font-size: 1.5rem;
+    }
+    .notification-item {
+        padding: 8px 2px;
+    }
+}
+/* --- End Modern Doctor Notifications Styles --- */

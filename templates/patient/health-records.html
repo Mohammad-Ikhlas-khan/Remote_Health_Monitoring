@@ -1,0 +1,468 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Health Records - Patient Portal</title>
+    <!-- Inter Font -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+   <link rel="stylesheet" href="{% static 'styles/health-record.css' %}">
+</head>
+<body>
+     <!-- Header Nav bar Profile -->
+    <div class="header">
+       <header class="header-container">
+        <div class="logoside">
+            <img src="{% static 'images/logo.png' %}" alt="logo" loading="lazy">
+        </div>
+        <div class="main-nav" id="navMenu">
+                    <a href="{% url 'patient_dashboard' %}" id="home-a" >Home</a>
+                    <a href="{% url 'patient_vitals_history' %}" id="alert-a" >Vitals History</a>
+                    <a href="{% url 'patient_health_records' %}" id="patient-a" class="active">Health Records</a>
+                    <a href="{% url 'patient_messages' %}" id="reports-a">Messages</a></li>
+                    <a href="{% url 'patient_profile' %}" id="setting-a"  >Profile</a>
+            
+        </div>
+        <div class="rightside">
+            <a href="{% url 'patient_notifications' %}" class="notification  active">Notifications 🔔</a>
+            <a href="{% url 'logout' %}" id="logout-a">Logout</a>
+            <a href="{% url 'patient_notifications' %}" class="m-notification"  active>🔔 </a>
+            <span class="badge">{{ unread_notifications_count }}</span>
+            <button type="button" class="menu-button" onclick="toggleMenu()">
+                <img src="{{ profile_pic_url }}" alt="Profile Picture" class="profile-pic">
+            </button>
+            <span class="patient-name">{{ request.user.first_name }} {{ request.user.last_name }}</span>
+        </div>
+       </header>
+    </div>
+
+    <div class="main-container">
+      <div class="main-content">
+        {% if messages %}
+          <div class="messages">
+            {% for message in messages %}
+              <div class="alert {{ message.tags }}">{{ message }}</div>
+            {% endfor %}
+          </div>
+        {% endif %}
+        <h1 class="page-title">Your Health Records</h1>
+
+        <div class="records-card">
+          <div class="records-header">
+              <div class="filters-card filters">
+                  <input type="text" id="searchInput" placeholder="Search by type, title, or date..." onkeyup="filterRecords()">
+                  <select id="typeFilter" onchange="filterRecords()">
+                      <option value="">All Types</option>
+                      <option value="prescription">Prescription</option>
+                      <option value="lab_result">Lab Result</option>
+                      <option value="diagnosis">Diagnosis</option>
+                      <option value="consultation_note">Consultation Note</option>
+                  </select>
+              </div>
+              <div class="actions">
+                  <button class="action-button" id="downloadAllRecordsButton">Download All Records (ZIP)</button>
+              </div>
+          </div>
+
+          <div class="records-list records-grid">
+              {% for record in medical_records %}
+              <div class="record-item record-card" data-record-id="{{ record.id }}" data-type="{{ record.record_type }}">
+                  <div class="record-summary">
+                      <span class="record-icon fas {% if record.record_type == 'prescription' %}fa-prescription{% elif record.record_type == 'lab_result' %}fa-flask{% elif record.record_type == 'diagnosis' %}fa-stethoscope{% else %}fa-file-alt{% endif %}"></span>
+                      <div class="record-details">
+                          <h3>{{ record.title }}</h3>
+                          <p class="record-meta">
+                              <span class="type">{{ record.record_type|capfirst }}</span> | 
+                              <span class="date">{{ record.record_date|date:"M d, Y" }}</span> |
+                              <span class="doctor">Dr. {{ record.doctor.user.last_name|default:"N/A" }}</span>
+                          </p>
+                          <p class="record-description">{{ record.description|truncatechars:150|default:"No description available." }}</p>
+                      </div>
+                  </div>
+                  <div class="record-actions">
+                      <button class="view-btn action-button" data-record-id="{{ record.id }}">View Details</button>
+                      {% if record.document %}
+                          <a href="{{ record.document.url }}" target="_blank" class="download-btn action-button">Download</a>
+                      {% else %}
+                          <button class="download-btn action-button" disabled title="No document attached">Download</button>
+                      {% endif %}
+                  </div>
+              </div>
+              {% empty %}
+              <p class="no-records">You have no health records yet.</p>
+              {% endfor %}
+          </div>
+
+          <div class="pagination">
+              <button id="prevPageButton" disabled>&laquo; Previous</button>
+              <span id="pageInfo">Page 1 of 1</span>
+              <button id="nextPageButton" disabled>Next &raquo;</button>
+          </div>
+        </div>
+
+        <!-- Modal for Full Record View -->
+        <div id="recordModal" class="modal">
+            <div class="modal-content">
+                <span class="close-button">&times;</span>
+                <div id="modalRecordContent">
+                    <!-- Record details will be loaded here -->
+                </div>
+                {% if user.is_authenticated and user.role == 'patient' %}
+                <div class="modal-actions">
+                    <button class="action-button" id="modalPrintButton">Print Record</button>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Modal for Document Upload -->
+        <div id="uploadModal" class="modal">
+            <div class="modal-content">
+                <span class="close-button">&times;</span>
+                <h2>Upload New Health Document</h2>
+                <form id="uploadForm" method="POST" enctype="multipart/form-data">
+                    {% csrf_token %}
+                    <div class="form-group">
+                        <label for="recordType">Record Type:</label>
+                        <select id="recordType" name="record_type" required>
+                            <option value="">-- Select Type --</option>
+                            <option value="prescription">Prescription</option>
+                            <option value="lab_result">Lab Result</option>
+                            <option value="diagnosis">Diagnosis</option>
+                            <option value="consultation_note">Consultation Note</option>
+                            <option value="other">Other</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="recordTitle">Title:</label>
+                        <input type="text" id="recordTitle" name="title" required placeholder="e.g., Blood Test Results">
+                    </div>
+                    <div class="form-group">
+                        <label for="recordDescription">Description:</label>
+                        <textarea id="recordDescription" name="description" rows="4" placeholder="Brief description of the record"></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label for="documentFile">Select Document (PDF only):</label>
+                        <input type="file" id="documentFile" name="document" accept=".pdf" required>
+                    </div>
+                    <button type="submit" class="save-button">Upload Document</button>
+                </form>
+            </div>
+        </div>
+      </div>
+    </div>
+
+    <script>
+        // JavaScript for mobile menu toggle (consistent with patient_dashboard.html)
+        function toggleMenu() {
+            const nav = document.getElementById('navMenu');
+            const home = document.getElementById('home-a');
+            const vitals = document.getElementById('alert-a'); // Vitals History
+            const records = document.getElementById('patient-a'); // Health Records
+            const messages = document.getElementById('reports-a'); // Messages
+            const profile = document.getElementById('setting-a'); // Profile
+
+            if (window.innerWidth <= 900) { // Keep consistent breakpoint for menu
+                nav.classList.toggle('show');
+                home.classList.toggle('show1');
+                vitals.classList.toggle('show2');
+                records.classList.toggle('show3');
+                messages.classList.toggle('show4');
+                profile.classList.toggle('show5');
+
+                if (nav.classList.contains('show')) {
+                    nav.style.display = 'flex';
+                    void nav.offsetWidth;
+                } else {
+                    nav.addEventListener('transitionend', () => {
+                        nav.style.display = 'none';
+                    }, { once: true });
+                }
+            }
+        }
+
+        function handleResize() {
+            const nav = document.getElementById('navMenu');
+            const home = document.getElementById('home-a');
+            const vitals = document.getElementById('alert-a');
+            const records = document.getElementById('patient-a');
+            const messages = document.getElementById('reports-a');
+            const profile = document.getElementById('setting-a');
+
+            if (window.innerWidth > 900) { // Keep consistent breakpoint for menu
+                nav.classList.remove('show');
+                nav.style.display = 'flex';
+                home.classList.remove('show1');
+                home.style.display = 'flex';
+                vitals.classList.remove('show2');
+                vitals.style.display = 'flex';
+                records.classList.remove('show3');
+                records.style.display = 'flex';
+                messages.classList.remove('show4');
+                messages.style.display = 'flex';
+                profile.classList.remove('show5');
+                profile.style.display = 'flex';
+            } else {
+                nav.style.display = nav.classList.contains('show') ? 'flex' : 'none';
+                home.style.display = home.classList.contains('show1') ? 'flex' : 'none';
+                vitals.style.display = vitals.classList.contains('show2') ? 'flex' : 'none';
+                records.style.display = records.classList.contains('show3') ? 'flex' : 'none';
+                messages.style.display = messages.classList.contains('show4') ? 'flex' : 'none';
+                profile.style.display = profile.classList.contains('show5') ? 'flex' : 'none';
+            }
+        }
+        window.addEventListener('resize', handleResize);
+        window.addEventListener('DOMContentLoaded', handleResize);
+
+        // --- Dynamic Record List and Filtering ---
+        const allRecordsData = [
+            {% for record in medical_records %}
+            {
+                id: {{ record.id }},
+                title: "{{ record.title|escapejs }}",
+                description: "{{ record.description|escapejs }}",
+                record_type: "{{ record.record_type }}",
+                record_date: "{{ record.record_date|date:'Y-m-d' }}",
+                doctor_name: "Dr. {{ record.doctor.user.last_name|default:'N/A' }}",
+                document_url: "{% if record.document %}{{ record.document.url }}{% else %}{% endif %}"
+            },
+            {% endfor %}
+        ];
+
+        let filteredRecordsData = [...allRecordsData];
+        let currentRecordsPage = 1;
+        const recordsPerPage = 10; // Number of records per page
+
+        const recordListContainer = document.querySelector('.records-list');
+        const searchInput = document.getElementById('searchInput');
+        const typeFilter = document.getElementById('typeFilter');
+        const prevPageButton = document.getElementById('prevPageButton');
+        const nextPageButton = document.getElementById('nextPageButton');
+        const pageInfoSpan = document.getElementById('pageInfo');
+
+        const recordModal = document.getElementById('recordModal');
+        const modalRecordContent = document.getElementById('modalRecordContent');
+        const modalPrintButton = document.getElementById('modalPrintButton');
+        const closeModalButtons = document.querySelectorAll('.close-button');
+
+        const uploadDocumentButton = document.getElementById('uploadDocumentButton');
+        const uploadModal = document.getElementById('uploadModal');
+        const uploadForm = document.getElementById('uploadForm');
+        const documentUploadInput = document.getElementById('documentFile');
+        const downloadAllRecordsButton = document.getElementById('downloadAllRecordsButton');
+
+
+        function renderRecords(data) {
+            recordListContainer.innerHTML = ''; // Clear existing records
+
+            if (data.length === 0) {
+                recordListContainer.innerHTML = '<p class="no-records">No health records found matching your filters.</p>';
+                pageInfoSpan.textContent = 'Page 0 of 0';
+                prevPageButton.disabled = true;
+                nextPageButton.disabled = true;
+                return;
+            }
+
+            const startIndex = (currentRecordsPage - 1) * recordsPerPage;
+            const endIndex = startIndex + recordsPerPage;
+            const recordsToDisplay = data.slice(startIndex, endIndex);
+
+            recordsToDisplay.forEach(record => {
+                const recordItem = document.createElement('div');
+                recordItem.classList.add('record-item');
+                recordItem.dataset.recordId = record.id;
+                recordItem.dataset.type = record.record_type;
+
+                const iconClass = {
+                    'prescription': 'fa-prescription',
+                    'lab_result': 'fa-flask',
+                    'diagnosis': 'fa-stethoscope',
+                    'consultation_note': 'fa-user-md', // Or another relevant icon
+                    'other': 'fa-file-alt'
+                }[record.record_type] || 'fa-file-alt'; // Default icon
+
+                recordItem.innerHTML = `
+                    <div class="record-summary">
+                        <span class="record-icon fas ${iconClass}"></span>
+                        <div class="record-details">
+                            <h3>${record.title}</h3>
+                            <p class="record-meta">
+                                <span class="type">${record.record_type.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase())}</span> | 
+                                <span class="date">${new Date(record.record_date).toLocaleDateString()}</span> |
+                                <span class="doctor">${record.doctor_name}</span>
+                            </p>
+                            <p class="record-description">${record.description || 'No description available.'}</p>
+                        </div>
+                    </div>
+                    <div class="record-actions">
+                        <button class="view-btn" data-record-id="${record.id}">View Details</button>
+                        ${record.document_url ? `<a href="${record.document_url}" target="_blank" class="download-btn">Download</a>` : `<button class="download-btn" disabled title="No document attached">Download</button>`}
+                    </div>
+                `;
+                recordListContainer.appendChild(recordItem);
+            });
+
+            updatePaginationControls(data.length);
+            addRecordActionListeners();
+        }
+
+        function updatePaginationControls(totalRecords) {
+            const totalPages = Math.ceil(totalRecords / recordsPerPage);
+            pageInfoSpan.textContent = `Page ${currentRecordsPage} of ${totalPages}`;
+            prevPageButton.disabled = currentRecordsPage === 1;
+            nextPageButton.disabled = currentRecordsPage === totalPages || totalPages === 0;
+        }
+
+        function filterRecords() {
+            const searchTerm = searchInput.value.toLowerCase();
+            const typeFilterValue = typeFilter.value;
+
+            filteredRecordsData = allRecordsData.filter(record => {
+                const matchesSearch = record.title.toLowerCase().includes(searchTerm) ||
+                                      record.description.toLowerCase().includes(searchTerm) ||
+                                      record.record_date.includes(searchTerm) || // Simple date match
+                                      record.doctor_name.toLowerCase().includes(searchTerm) ||
+                                      record.record_type.toLowerCase().includes(searchTerm);
+                const matchesType = typeFilterValue === '' || record.record_type === typeFilterValue;
+                return matchesSearch && matchesType;
+            });
+            currentRecordsPage = 1; // Reset to first page after filtering
+            renderRecords(filteredRecordsData);
+        }
+
+        function showFullRecord(recordId) {
+            const record = allRecordsData.find(r => r.id === recordId);
+            if (record) {
+                modalRecordContent.innerHTML = `
+                    <h2>${record.title}</h2>
+                    <p><strong>Type:</strong> ${record.record_type.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase())}</p>
+                    <p><strong>Date:</strong> ${new Date(record.record_date).toLocaleDateString()}</p>
+                    <p><strong>Doctor:</strong> ${record.doctor_name}</p>
+                    <hr>
+                    <h4>Description:</h4>
+                    <p>${record.description || 'No description available.'}</p>
+                    {% if user.is_authenticated and user.role == 'patient' %}
+                        {% comment %} Assuming document_url is a full URL or path Django can handle {% endcomment %}
+                        ${record.document_url ? `<p><a href="${record.document_url}" target="_blank" class="download-btn">View/Download Document</a></p>` : `<p>No document attached.</p>`}
+                    {% endif %}
+                `;
+                modalPrintButton.dataset.recordId = recordId; // Set ID for print button
+                recordModal.style.display = 'block';
+            }
+        }
+
+        function addRecordActionListeners() {
+            document.querySelectorAll('.record-item .view-btn').forEach(button => {
+                button.addEventListener('click', (event) => {
+                    const recordId = parseInt(event.target.dataset.recordId);
+                    showFullRecord(recordId);
+                });
+            });
+        }
+
+        function printModalContent() {
+            const printContent = modalRecordContent.innerHTML;
+            const printWindow = window.open('', '', 'height=600,width=800');
+            printWindow.document.write('<html><head><title>Print Health Record</title>');
+            printWindow.document.write('<link rel="stylesheet" href="{% static 'styles/health-record.css' %}">'); // Include relevant print styles
+            printWindow.document.write('</head><body>');
+            printWindow.document.write(printContent);
+            printWindow.document.write('</body></html>');
+            printWindow.document.close();
+            printWindow.focus();
+            printWindow.print();
+            printWindow.close();
+        }
+
+
+        // Event Listeners for Modals and Pagination
+        closeModalButtons.forEach(button => {
+            button.addEventListener('click', () => {
+                recordModal.style.display = 'none';
+                uploadModal.style.display = 'none';
+            });
+        });
+
+        window.addEventListener('click', (event) => {
+            if (event.target == recordModal) {
+                recordModal.style.display = 'none';
+            }
+            if (event.target == uploadModal) {
+                uploadModal.style.display = 'none';
+            }
+        });
+
+        if (modalPrintButton) {
+            modalPrintButton.addEventListener('click', printModalContent);
+        }
+
+        prevPageButton.addEventListener('click', () => {
+            if (currentRecordsPage > 1) {
+                currentRecordsPage--;
+                renderRecords(filteredRecordsData);
+            }
+        });
+
+        nextPageButton.addEventListener('click', () => {
+            const totalPages = Math.ceil(filteredRecordsData.length / recordsPerPage);
+            if (currentRecordsPage < totalPages) {
+                currentRecordsPage++;
+                renderRecords(filteredRecordsData);
+            }
+        });
+
+        uploadDocumentButton.addEventListener('click', () => {
+            uploadModal.style.display = 'block';
+        });
+
+        uploadForm.addEventListener('submit', (event) => {
+            event.preventDefault(); // Prevent default form submission
+
+            const formData = new FormData(uploadForm);
+            // In a real Django app, you'd send this via fetch or XMLHttpRequest
+            // Example fetch:
+            /*
+            fetch('{% url 'upload_health_record' %}', { // Define this URL in your urls.py
+                method: 'POST',
+                body: formData,
+                headers: {
+                    'X-CSRFToken': '{{ csrf_token }}' // Include CSRF token for Django
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    alert('Document uploaded successfully!');
+                    uploadModal.style.display = 'none';
+                    uploadForm.reset();
+                    // Optionally, re-fetch records or add the new record to allRecordsData array
+                    location.reload(); // Simple reload for demonstration
+                } else {
+                    alert('Upload failed: ' + (data.error || 'Unknown error'));
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('An error occurred during upload.');
+            });
+            */
+            alert('Simulating upload: Document would be uploaded to backend now. (Requires backend implementation)');
+            uploadModal.style.display = 'none';
+            uploadForm.reset();
+            location.reload(); // Reload to reflect (simulated) changes
+        });
+
+        downloadAllRecordsButton.addEventListener('click', () => {
+            alert('Simulating download of all records as a ZIP file. (Requires backend processing)');
+            // In a real application, this would trigger a backend process
+            // to zip selected or all records and initiate a download.
+        });
+
+        // Initial render on page load
+        document.addEventListener('DOMContentLoaded', () => {
+            filterRecords(); // Render with initial filters (empty)
+        });
+    </script>
+</body>
+</html>

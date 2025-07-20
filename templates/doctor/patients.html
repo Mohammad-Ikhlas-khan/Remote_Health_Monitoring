@@ -1,0 +1,203 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Patients - MediDash Doctor</title>
+    <link rel="stylesheet" href="{% static 'styles/patients.css' %}">
+</head>
+<body>
+    <!-- Header Nav bar Profile -->
+    <div class="header">
+       <header class="header-container">
+        <div class="logoside">
+            <img src="{% static 'innerimg/logo.png' %}" alt="logo" loading="lazy">
+        </div>
+        <div class="main-nav" id="navMenu">
+            <a href="{% url 'doctor_dashboard' %}" id="home-a" >Home</a>
+            <a href="{% url 'doctor_patients_list' %}" id="patient-a" class="active">Patients</a>
+            <a href="{% url 'doctor_alerts' %}" id="alert-a" >Alerts</a>
+            <a href="{% url 'doctor_reports' %}" id="reports-a">Reports</a>
+            <a href="{% url 'doctor_settings' %}" id="setting-a">Settings</a>
+        </div>
+        <div class="rightside">
+            <a href="{% url 'doctor_notifications' %}" class="notification">Notifications 🔔</a>
+            <a href="{% url 'logout' %}" id="logout-a">Logout</a>
+            <a href="{% url 'doctor_notifications' %}" class="m-notification">🔔 </a>
+            <span class="badge">{{ unread_notifications_count }}</span>
+            <button type="button" class="menu-button" onclick="toggleMenu()">
+                <img src="{{ profile_pic_url }}" alt="Profile Picture" class="profile-pic">
+            </button>
+            <span class="doctor-name">{{ request.user.first_name }} {{ request.user.last_name }}</span>
+        </div>
+       </header>
+    </div>
+
+    <div class="main-container">
+        <h1>Your Patients</h1>
+
+        <div class="filters">
+            <input type="text" id="searchInput" placeholder="Search by name or ID..." onkeyup="filterPatients()">
+            <select id="conditionFilter" onchange="filterPatients()">
+                <option value="">All Conditions</option>
+                <option value="Stable">Stable</option>
+                <option value="Critical">Critical</option>
+                <option value="Recovering">Recovering</option>
+                <!-- Add more conditions as needed, perhaps dynamically from backend -->
+            </select>
+        </div>
+
+        <div class="patient-list">
+            {% for patient in patients %}
+            <div class="patient-card">
+                <div class="patient-info">
+                    <img src="{{ patient.profile_picture_url|default:'https://placehold.co/40x40/f0f4f7/556080?text=PT' }}" alt="Patient Profile" class="patient-profile-pic">
+                    <div class="details">
+                        <h2>{{ patient.user.first_name }} {{ patient.user.last_name }} (ID: {{ patient.user.id }})</h2>
+                        <p>Gender: {{ patient.gender|capfirst|default:"N/A" }}</p>
+                        <p>Date of Birth: {{ patient.date_of_birth|date:"M d, Y"|default:"N/A" }}</p>
+                        <p>Contact: {{ patient.contact_number|default:"N/A" }}</p>
+                        <p>Condition: N/A <!-- This should come from patient model or derived from vitals/alerts --></p>
+                    </div>
+                </div>
+                <div class="patient-actions">
+                    <a href="/doctor-patient/{{ patient.user.id }}/" class="action-button">View Details</a>
+                    <button class="action-button message-button" data-patient-id="{{ patient.user.id }}">Message</button>
+                </div>
+            </div>
+            {% empty %}
+            <p class="no-patients">No patients found.</p>
+            {% endfor %}
+        </div>
+    </div>
+
+    <script>
+        // JavaScript for mobile menu toggle (consistent with doctor.html)
+        function toggleMenu() {
+            const nav = document.getElementById('navMenu');
+            const home = document.getElementById('home-a');
+            const patient = document.getElementById('patient-a');
+            const Alert = document.getElementById('alert-a');
+            const reports = document.getElementById('reports-a');
+            const setting = document.getElementById('setting-a');
+    
+            if (window.innerWidth <= 986) {
+                nav.classList.toggle('show');
+                home.classList.toggle('show1');
+                patient.classList.toggle('show2');
+                Alert.classList.toggle('show3');
+                reports.classList.toggle('show4');
+                setting.classList.toggle('show5');
+    
+                if (nav.classList.contains('show')) {
+                    nav.style.display = 'flex';
+                    void nav.offsetWidth;
+                } else {
+                    nav.addEventListener('transitionend', () => {
+                        nav.style.display = 'none';
+                    }, { once: true });
+                }
+            }
+        }
+    
+        // Handle resize event to adjust menu display (consistent with doctor.html)
+        function handleResize() {
+            const nav = document.getElementById('navMenu');
+            const home = document.getElementById('home-a');
+            const patient = document.getElementById('patient-a');
+            const Alert = document.getElementById('alert-a');
+            const reports = document.getElementById('reports-a');
+            const setting = document.getElementById('setting-a');
+    
+            if (window.innerWidth > 986) {
+                nav.classList.remove('show');
+                nav.style.display = 'flex';
+                home.classList.remove('show1');
+                home.style.display = 'flex';
+                patient.classList.remove('show2');
+                patient.style.display = 'flex';
+                Alert.classList.remove('show3');
+                Alert.style.display = 'flex';
+                reports.classList.remove('show4');
+                reports.style.display = 'flex';
+                setting.classList.remove('show5');
+                setting.style.display = 'flex';
+            } else {
+                nav.style.display = nav.classList.contains('show') ? 'flex' : 'none';
+                home.style.display = home.classList.contains('show1') ? 'flex' : 'none';
+                patient.style.display = patient.classList.contains('show2') ? 'flex' : 'none';
+                Alert.style.display = Alert.classList.contains('show3') ? 'flex' : 'none';
+                reports.style.display = reports.classList.contains('show4') ? 'flex' : 'none';
+                setting.style.display = setting.classList.contains('show5') ? 'flex' : 'none';
+            }
+        }
+        window.addEventListener('resize', handleResize);
+        window.addEventListener('DOMContentLoaded', handleResize);
+    
+        // Data from Django context for filtering
+        const allPatients = [
+            {% for patient in patients %}
+            {
+                id: {{ patient.user.id }},
+                fullName: "{{ patient.user.first_name }} {{ patient.user.last_name }}",
+                gender: "{{ patient.gender }}",
+                dob: "{{ patient.date_of_birth|date:'Y-m-d' }}",
+                contact: "{{ patient.contact_number }}",
+                condition: "N/A",
+                profilePic: "{{ patient.profile_picture_url|default:'https://placehold.co/40x40/f0f4f7/556080?text=PT' }}"
+            }{% if not forloop.last %},{% endif %}
+            {% endfor %}
+        ];
+    
+        function renderPatients(filteredPatients) {
+            const patientListDiv = document.querySelector('.patient-list');
+            patientListDiv.innerHTML = '';
+    
+            if (filteredPatients.length === 0) {
+                patientListDiv.innerHTML = '<p class="no-patients">No patients found matching your criteria.</p>';
+                return;
+            }
+    
+            filteredPatients.forEach(patient => {
+                const patientCard = document.createElement('div');
+                patientCard.classList.add('patient-card');
+                patientCard.innerHTML = `
+                    <div class="patient-info">
+                        <img src="${patient.profilePic}" alt="Patient Profile" class="patient-profile-pic">
+                        <div class="details">
+                            <h2>${patient.fullName} (ID: ${patient.id})</h2>
+                            <p>Gender: ${patient.gender ? patient.gender.charAt(0).toUpperCase() + patient.gender.slice(1) : 'N/A'}</p>
+                            <p>Date of Birth: ${patient.dob || 'N/A'}</p>
+                            <p>Contact: ${patient.contact || 'N/A'}</p>
+                            <p>Condition: ${patient.condition}</p>
+                        </div>
+                    </div>
+                    <div class="patient-actions">
+                        <a href="/doctor-patient/${patient.id}/" class="action-button">View Details</a>
+                        <a href="/doctor/messages/${patient.id}/" class="action-button message-btn">Message</a>
+                    </div>
+                `;
+                patientListDiv.appendChild(patientCard);
+            });
+        }
+    
+        function filterPatients() {
+            const searchInput = document.getElementById('searchInput').value.toLowerCase();
+            const conditionFilter = document.getElementById('conditionFilter').value;
+    
+            const filtered = allPatients.filter(patient => {
+                const matchesSearch = patient.fullName.toLowerCase().includes(searchInput) ||
+                                      patient.id.toString().includes(searchInput);
+                const matchesCondition = conditionFilter === '' || patient.condition === conditionFilter;
+                return matchesSearch && matchesCondition;
+            });
+            renderPatients(filtered);
+        }
+    
+        document.addEventListener('DOMContentLoaded', () => {
+            renderPatients(allPatients);
+        });
+    </script>
+    </body>
+</html>

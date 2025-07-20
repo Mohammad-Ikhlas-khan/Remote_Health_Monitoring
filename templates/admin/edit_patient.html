@@ -1,0 +1,36 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Edit Patient - MediDash Admin</title>
+    <link rel="stylesheet" href="{% static 'styles/patient.css' %}">
+</head>
+<body>
+    <div class="main-container">
+        <h1>Edit Patient</h1>
+        <form method="post" enctype="multipart/form-data" class="admin-edit-form">
+            {% csrf_token %}
+            {{ form.as_p }}
+            <button type="submit" class="action-button">Save Changes</button>
+        </form>
+        {% if devices %}
+        <div class="assigned-devices" style="margin-top: 2rem;">
+            <h2>Assigned Devices</h2>
+            <ul>
+                {% for device in devices %}
+                <li>
+                    <strong>{{ device.device_name }}</strong> ({{ device.device_type }}) - MAC: {{ device.mac_address }}
+                    <form method="post" action="{% url 'admin_delete_device' device.id %}" style="display:inline; margin-left: 1rem;">
+                        {% csrf_token %}
+                        <button type="submit" class="delete-btn" onclick="return confirm('Are you sure you want to delete this device?');">Delete</button>
+                    </form>
+                </li>
+                {% endfor %}
+            </ul>
+        </div>
+        {% endif %}
+    </div>
+</body>
+</html> 

@@ -1,0 +1,320 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>View Records</title>
+    <link rel="stylesheet" href="{% static 'styles/records.css' %}">
+</head>
+<body>
+    <!-- Header Nav bar Profile -->
+    <div class="header">
+       <header class="header-container">
+        <div class="logoside">
+            <img src="{% static 'innerimg/logo.png' %}" alt="logo" loading="lazy">
+        </div>
+        <div class="main-nav" id="navMenu">
+            <a href="{% url 'admin_dashboard' %}" Id="home-a">Home</a>
+        <a href="{% url 'admin_register_user' %}" id="patient-a">Register Users</a>
+        <a href="{% url 'admin_view_records' %}" id="alert-a" class="active">View Records</a>
+        <a href="{% url 'admin_register_device' %}" id="device-a">Register Device</a>
+        <a href="{% url 'admin_settings' %}" id="setting-a">Settings</a>
+        </div>
+        <div class="rightside">
+            <a href="{% url 'admin_notifications' %}" class="notification">Notifications 🔔</a>
+            <a href="{% url 'logout' %}" id="logout-a">Logout</a>
+            <a href="{% url 'admin_notifications' %}" class="m-notification">🔔 </a><span class="badge">3</span>
+            <button type="button" class="menu-button" onclick="toggleMenu()"><img src="{% static 'images/hamburger-menu-more.svg' %}" alt="menu-icon" class="menu-icon"></button>
+        </div>
+        </header>
+    </div>
+
+    <div class="main-container">
+        <main class="form-container">
+           <h1 class="toggle-heading" style="text-align:center; margin-bottom:1rem; font-size:2rem; color:#34495e;">View Records</h1>
+           <div class="form-toggle" style="justify-content:center; gap:2.5rem;">
+            <button id="toggle-doctors" onclick="switchForm('doctors')" class="active">Doctors</button>
+            <button id="toggle-patients" onclick="switchForm('patients')">Patients</button>
+        </div> 
+        <div class="form-wrapper">
+            <div id="doctors" class="form-section active" style="transition: opacity 0.3s;">
+               <h2>Doctors List</h2>
+                <div class="search-bar">
+        <input type="text" id="searchInputDoctor" placeholder="Search by name..." onkeyup="filterDoctors()" />
+        <select id="specialtyFilter" onchange="filterDoctors()">
+          <option value="">All Specialties</option>
+          <option value="Cardiology">Cardiology</option>
+          <option value="Dermatology">Dermatology</option>
+          <option value="Neurology">Neurology</option>
+          <option value="Pediatrics">Pediatrics</option>
+        </select>
+      </div>
+      <table>
+        <thead>
+          <tr>
+            <th>Doctor ID</th>
+            <th>Name</th>
+            <th>Specialty</th>
+            <th>Contact</th>
+            <th>Status</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody id="doctorTableBody"></tbody>
+      </table>
+            </div>
+            <div id="patients"  class="form-section" style="display:none; transition: opacity 0.3s;">
+                <h2>Patients List</h2>
+                <div class="search-bar">
+        <input type="text" id="searchInputPatient" placeholder="Search by name..." onkeyup="filterPatients()" />
+        <select id="conditionFilter" onchange="filterPatients()">
+          <option value="">All Conditions</option>
+          <option value="Diabetes">Diabetes</option>
+          <option value="Hypertension">Hypertension</option>
+          <option value="Asthma">Asthma</option>
+          <option value="None">No Known Conditions</option>
+                    </select>
+                </div>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Patient ID</th>
+                            <th>Name</th>
+                            <th>Age</th>
+                            <th>Gender</th>
+                            <th>Condition</th>
+                            <th>Last Visit</th>
+                            <th>Status</th>
+            <th>Devices Assigned</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+        <tbody id="patientTableBody"></tbody>
+                </table>
+            </div>
+        </div>
+          </main>
+        </div>
+    </div>
+
+    <script id="doctors_data_json" type="application/json">{{ doctors|safe }}</script>
+    <script id="patients_data_json" type="application/json">{{ patients|safe }}</script>
+
+    <script>
+        // Get data from Django context using json_script to make it available to JS
+        // This assumes your views pass 'patients' and 'doctors' as querysets that can be serialized.
+        // You might need to adjust your view to serialize querysets to lists of dicts
+        // if your models are complex or contain non-JSON serializable fields.
+        const initialPatients = JSON.parse(document.getElementById('patients_data_json').textContent || '[]');
+        const initialDoctors = JSON.parse(document.getElementById('doctors_data_json').textContent || '[]');
+
+        let currentPatients = [...initialPatients];
+        let currentDoctors = [...initialDoctors];
+
+        // Functions to render table rows based on filtered data
+        function renderPatients(patientsToRender) {
+            const tableBody = document.getElementById('patientTableBody');
+            tableBody.innerHTML = ''; // Clear existing rows
+            patientsToRender.forEach(patient => {
+                const row = tableBody.insertRow();
+                row.innerHTML = `
+                    <td>${patient.id}</td>
+                    <td>${patient.full_name}</td>
+                    <td>${patient.age || 'N/A'}</td>
+                    <td>${patient.gender || 'N/A'}</td>
+                    <td>${patient.medical_conditions || 'None'}</td>
+                    <td>${patient.last_visit || 'N/A'}</td>
+                    <td><span class="status-${(patient.status || 'unknown').toLowerCase()}">${patient.status || 'Unknown'}</span></td>
+                    <td class="devices-cell">
+                        ${patient.devices && patient.devices !== 'None' ? patient.devices.split(',').map(d => `<span class='device-badge'>${d.trim()}</span>`).join('') : '<span style="color:#bbb;">None</span>'}
+                    </td>
+                    <td>
+                        <button class="table-action-btn view" onclick="viewDetails('${patient.id}', 'patient')">View</button>
+                        <button class="table-action-btn edit" onclick="editRecord('${patient.id}', 'patient')">Edit</button>
+                        <form method="post" action="/admin-delete-patient/${patient.id}/" style="display:inline;" onsubmit="return confirm('Are you sure you want to delete this patient? This will also delete all assigned devices.');">
+                            <input type="hidden" name="csrfmiddlewaretoken" value="${window.csrfToken}">
+                            <button type="submit" class="table-action-btn delete">Delete</button>
+                        </form>
+                    </td>
+                `;
+            });
+        }
+
+        function renderDoctors(doctorsToRender) {
+            const tableBody = document.getElementById('doctorTableBody');
+            tableBody.innerHTML = ''; // Clear existing rows
+            doctorsToRender.forEach(doctor => {
+                const row = tableBody.insertRow();
+                row.innerHTML = `
+                    <td>${doctor.id}</td>
+                    <td>${doctor.full_name}</td>
+                    <td>${doctor.specialty || 'N/A'}</td>
+                    <td>${doctor.email || 'N/A'}</td>
+                    <td><span class="status-${(doctor.status || 'unknown').toLowerCase()}">${doctor.status || 'Unknown'}</span></td>
+                    <td>
+                        <button class="table-action-btn view" onclick="viewDetails('${doctor.id}', 'doctor')">View</button>
+                        <button class="table-action-btn edit" onclick="editRecord('${doctor.id}', 'doctor')">Edit</button>
+                        <form method="post" action="/admin-delete-doctor/${doctor.id}/" style="display:inline;" onsubmit="return confirm('Are you sure you want to delete this doctor?');">
+                            <input type="hidden" name="csrfmiddlewaretoken" value="${window.csrfToken}">
+                            <button type="submit" class="table-action-btn delete">Delete</button>
+                        </form>
+                    </td>
+                `;
+            });
+        }
+       
+
+        function switchForm(type) {
+            const doctorBtn = document.getElementById('toggle-doctors');
+            const patientBtn = document.getElementById('toggle-patients');
+      const doctorForm = document.getElementById('doctors');
+      const patientForm = document.getElementById('patients');
+
+            if (type === 'doctors') {
+        doctorBtn.classList.add('active');
+        patientBtn.classList.remove('active');
+        doctorForm.classList.add('active');
+                doctorForm.style.display = '';
+        patientForm.classList.remove('active');
+                patientForm.style.display = 'none';
+      } else {
+        patientBtn.classList.add('active');
+        doctorBtn.classList.remove('active');
+        patientForm.classList.add('active');
+                patientForm.style.display = '';
+        doctorForm.classList.remove('active');
+                doctorForm.style.display = 'none';
+      }
+    }
+        // Functions to switch between tabs
+        // function switchTab(type) {
+        //     const patientBtn = document.querySelectorAll('.form-toggle button')[0];
+        //     const doctorBtn = document.querySelectorAll('.toggle-tabs button')[1];
+        //     const patientTab = document.getElementById('patients-tab');
+        //     const doctorTab = document.getElementById('doctors-tab');
+
+        //     if (type === 'patients') {
+        //         patientBtn.classList.add('active');
+        //         doctorBtn.classList.remove('active');
+        //         patientTab.classList.add('active');
+        //         doctorTab.classList.remove('active');
+        //         renderPatients(currentPatients);
+        //         document.getElementById('searchInputPatient').value = '';
+        //         document.getElementById('conditionFilter').value = '';
+        //         filterPatients(); // Apply filters if any
+        //     } else {
+        //         doctorBtn.classList.add('active');
+        //         patientBtn.classList.remove('active');
+        //         doctorTab.classList.add('active');
+        //         patientTab.classList.remove('active');
+        //         renderDoctors(currentDoctors);
+        //         document.getElementById('searchInputDoctor').value = '';
+        //         document.getElementById('specialtyFilter').value = '';
+        //         filterDoctors(); // Apply filters if any
+        //     }
+        // }
+
+        // Client-side filtering functions
+        function filterPatients() {
+            const searchInput = document.getElementById('searchInputPatient');
+            const search = searchInput ? searchInput.value.toLowerCase() : '';
+            const conditionFilter = document.getElementById('conditionFilter');
+            const condition = conditionFilter ? conditionFilter.value : '';
+
+            let filtered = initialPatients.filter(p =>
+                (p.full_name && p.full_name.toLowerCase().includes(search)) &&
+                (condition === '' || (p.medical_conditions && p.medical_conditions.includes(condition)))
+            );
+            currentPatients = filtered;
+            renderPatients(currentPatients);
+        }
+
+        function filterDoctors() {
+            const searchInput = document.getElementById('searchInputDoctor');
+            const search = searchInput ? searchInput.value.toLowerCase() : '';
+            const specialtyFilter = document.getElementById('specialtyFilter');
+            const specialty = specialtyFilter ? specialtyFilter.value : '';
+
+            let filtered = initialDoctors.filter(d =>
+                (d.full_name && d.full_name.toLowerCase().includes(search)) &&
+                (specialty === '' || (d.specialty && d.specialty === specialty))
+            );
+            currentDoctors = filtered;
+            renderDoctors(currentDoctors);
+        }
+
+        // Placeholder for action buttons
+        function viewDetails(id, type) {
+            // Redirect to the detailed view page
+            window.location.href = `/admin-${type}-details/${id}/`;
+        }
+
+        function editRecord(id, type) {
+            // Redirect to the edit form page
+            window.location.href = `/admin-edit-${type}/${id}/`;
+        }
+
+        // Initialize the first tab content on page load
+        document.addEventListener('DOMContentLoaded', () => {
+            switchForm('doctors');
+            renderDoctors(currentDoctors);
+            renderPatients(currentPatients);
+        });
+
+        // --- Header menu toggle JS (retained from other files) ---
+        const nav = document.getElementById('navMenu');
+        const home = document.getElementById('home-a');
+        const patient = document.getElementById('patient-a');
+        const Alert = document.getElementById('alert-a');
+        const reports = document.getElementById('reports-a'); // Still present from original structure
+        const setting = document.getElementById('setting-a');
+        const toggleBtn = document.querySelector('.menu-button');
+
+        function toggleMenu() {
+          if (window.innerWidth <= 986) {
+            nav.classList.toggle('show');
+            home.classList.toggle('show1');
+            patient.classList.toggle('show2');
+            Alert.classList.toggle('show3');
+            if (reports) reports.classList.toggle('show4');
+            setting.classList.toggle('show5');
+
+            if (nav.classList.contains('show')) {
+              nav.style.display = 'flex';
+              void nav.offsetWidth;
+            } else {
+              nav.addEventListener('transitionend', () => {
+                nav.style.display = 'none';
+              }, { once: true });
+            }
+          }
+        }
+
+        function handleResize() {
+          if (window.innerWidth > 986) {
+            nav.classList.remove('show');
+            nav.style.display = 'flex';
+            home.classList.remove('show1');
+            home.style.display = 'flex';
+            patient.classList.remove('show2');
+            patient.style.display = 'flex';
+            Alert.classList.remove('show3');
+            Alert.style.display = 'flex';
+            if (reports) reports.classList.remove('show4');
+            if (reports) reports.style.display = 'flex';
+            setting.classList.remove('show5');
+            setting.style.display = 'flex';
+          } else {
+            nav.style.display = nav.classList.contains('show') ? 'flex' : 'none';
+          }
+        }
+
+        window.addEventListener('resize', handleResize);
+        window.addEventListener('DOMContentLoaded', handleResize);
+
+        // Add CSRF token to window for use in JS-generated forms
+        window.csrfToken = '{{ csrf_token }}';
+    </script>
+</body>
+</html>

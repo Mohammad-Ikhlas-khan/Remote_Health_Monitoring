@@ -1,0 +1,186 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Doctor Notifications - MediDash</title>
+    <link rel="stylesheet" href="{% static 'styles/notfications_doctor.css' %}">
+</head>
+<body>
+    <!-- Header Nav bar Profile -->
+   <div class="header">
+       <header class="header-container">
+        <div class="logoside">
+            <img src="{% static 'innerimg/logo.png' %}" alt="logo" loading="lazy">
+        </div>
+        <div class="main-nav" id="navMenu">
+            <a href="{% url 'doctor_dashboard' %}" id="home-a" >Home</a>
+            <a href="{% url 'doctor_patients_list' %}" id="patient-a" >Patients</a>
+            <a href="{% url 'doctor_alerts' %}" id="alert-a" >Alerts</a>
+            <a href="{% url 'doctor_reports' %}" id="reports-a" >Reports</a>
+            <a href="{% url 'doctor_settings' %}" id="setting-a" >Settings</a>
+        </div>
+        <div class="rightside">
+            <a href="{% url 'doctor_notifications' %}" class="notification active">Notifications 🔔</a>
+            <a href="{% url 'logout' %}" id="logout-a">Logout</a>
+            <a href="{% url 'doctor_notifications' %}" class="m-notification active">🔔 </a>
+            <span class="badge">{{ unread_notifications_count }}</span>
+            <button type="button" class="menu-button" onclick="toggleMenu()">
+                <img src="{{ profile_pic_url }}" alt="Profile Picture" class="profile-pic">
+            </button>
+            <span class="doctor-name">{{ request.user.first_name }} {{ request.user.last_name }}</span>
+        </div>
+       </header>
+    </div>
+
+    <div class="notifications-container">
+        <h1>Your Notifications</h1>
+        <div class="notifications-actions" style="margin-bottom: 18px; display: flex; gap: 16px; align-items: center;">
+            <form method="post" style="display: inline; margin-right: 12px;">
+                {% csrf_token %}
+                <input type="hidden" name="action" value="mark_all_read">
+                <button type="submit" class="mark-all-btn">Mark All As Read</button>
+            </form>
+            <a href="?filter=unread" class="mark-all-btn" style="background: {% if filter_state == 'unread' %}linear-gradient(90deg, #217dbb 0%, #3498db 100%){% else %}#eaf4fb{% endif %}; color: {% if filter_state == 'unread' %}#fff{% else %}#3498db{% endif %};">Unread</a>
+            <a href="?filter=read" class="mark-all-btn" style="background: {% if filter_state == 'read' %}linear-gradient(90deg, #217dbb 0%, #3498db 100%){% else %}#eaf4fb{% endif %}; color: {% if filter_state == 'read' %}#fff{% else %}#3498db{% endif %};">Read</a>
+        </div>
+        <div class="notifications-list" id="notificationList">
+            {% for notification in notifications %}
+            <div class="notification-item {% if not notification.is_read %}unread{% endif %}" data-notification-id="{{ notification.id }}">
+                <div class="notification-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+                    <span class="notification-type" style="font-weight: 600; color: #3498db;">{{ notification.notification_type|capfirst }}</span>
+                    <span class="notification-date" style="font-size: 0.98rem; color: #7f8c8d;">{{ notification.timestamp|date:"M d, Y H:i" }}</span>
+                </div>
+                <div class="notification-body">
+                    <p>{{ notification.message }}</p>
+                </div>
+                <div class="notification-actions" style="margin-top: 10px;">
+                    {% if not notification.is_read %}
+                        <button class="notification-action-btn mark-read-btn" data-notification-id="{{ notification.id }}">Mark as Read</button>
+                    {% else %}
+                        <button class="notification-action-btn mark-read-btn" data-notification-id="{{ notification.id }}" disabled>Read</button>
+                    {% endif %}
+                    <button class="notification-action-btn dismiss-btn" data-notification-id="{{ notification.id }}">Dismiss</button>
+                </div>
+            </div>
+            {% empty %}
+            <p class="no-notifications" style="color: #7f8c8d; font-size: 1.1rem; margin-top: 32px;">No notifications found.</p>
+            {% endfor %}
+        </div>
+    </div>
+
+    <script>
+        // JavaScript for mobile menu toggle (consistent with doctor.html)
+        function toggleMenu() {
+            const nav = document.getElementById('navMenu');
+            const home = document.getElementById('home-a');
+            const patient = document.getElementById('patient-a');
+            const Alert = document.getElementById('alert-a');
+            const reports = document.getElementById('reports-a');
+            const setting = document.getElementById('setting-a');
+
+            if (window.innerWidth <= 986) {
+                nav.classList.toggle('show');
+                home.classList.toggle('show1');
+                patient.classList.toggle('show2');
+                Alert.classList.toggle('show3');
+                reports.classList.toggle('show4');
+                setting.classList.toggle('show5');
+
+                if (nav.classList.contains('show')) {
+                    nav.style.display = 'flex';
+                    void nav.offsetWidth;
+                } else {
+                    nav.addEventListener('transitionend', () => {
+                        nav.style.display = 'none';
+                    }, { once: true });
+                }
+            }
+        }
+
+        // Handle resize event to adjust menu display (consistent with doctor.html)
+        function handleResize() {
+            const nav = document.getElementById('navMenu');
+            const home = document.getElementById('home-a');
+            const patient = document.getElementById('patient-a');
+            const Alert = document.getElementById('alert-a');
+            const reports = document.getElementById('reports-a');
+            const setting = document.getElementById('setting-a');
+
+            if (window.innerWidth > 986) {
+                nav.classList.remove('show');
+                nav.style.display = 'flex';
+                home.classList.remove('show1');
+                home.style.display = 'flex';
+                patient.classList.remove('show2');
+                patient.style.display = 'flex';
+                Alert.classList.remove('show3');
+                Alert.style.display = 'flex';
+                reports.classList.remove('show4');
+                reports.style.display = 'flex';
+                setting.classList.remove('show5');
+                setting.style.display = 'flex';
+            } else {
+                nav.style.display = nav.classList.contains('show') ? 'flex' : 'none';
+                home.style.display = home.classList.contains('show1') ? 'flex' : 'none';
+                patient.style.display = patient.classList.contains('show2') ? 'flex' : 'none';
+                Alert.style.display = Alert.classList.contains('show3') ? 'flex' : 'none';
+                reports.style.display = reports.classList.contains('show4') ? 'flex' : 'none';
+                setting.style.display = setting.classList.contains('show5') ? 'flex' : 'none';
+            }
+        }
+        window.addEventListener('resize', handleResize);
+        window.addEventListener('DOMContentLoaded', handleResize);
+
+        // DYNAMIC JAVASCRIPT LOGIC FOR NOTIFICATIONS (ADAPTED FOR DJANGO)
+        // This part needs AJAX or form submissions to update backend status
+        document.addEventListener('DOMContentLoaded', () => {
+            const markAllReadButton = document.getElementById('markAllReadButton');
+            const notificationList = document.getElementById('notificationList');
+
+            markAllReadButton.addEventListener('click', () => {
+                // In a real Django app, this would send an AJAX request to mark all as read
+                alert('Marking all notifications as read (frontend simulation).');
+                // You would typically reload the page or update UI based on successful AJAX response
+                location.reload(); // Simple reload for demonstration
+            });
+
+            notificationList.addEventListener('click', (event) => {
+                const target = event.target;
+                if (target.classList.contains('mark-read-btn')) {
+                    const notificationId = target.dataset.notificationId;
+                    alert(`Marking notification ${notificationId} as read (frontend simulation).`);
+                    // AJAX call to Django view to update notification status
+                    // After success, change button text/disable and update unread count
+                    target.textContent = 'Read';
+                    target.disabled = true;
+                    target.closest('.notification-item').classList.remove('unread');
+                    updateUnreadCountDisplay();
+                } else if (target.classList.contains('dismiss-btn')) {
+                    const notificationId = target.dataset.notificationId;
+                    alert(`Dismissing notification ${notificationId} (frontend simulation).`);
+                    // AJAX call to Django view to delete/dismiss notification
+                    target.closest('.notification-item').remove();
+                    updateUnreadCountDisplay();
+                }
+            });
+
+            // Function to update the unread count in the badge
+            function updateUnreadCountDisplay() {
+                // This count should ideally come from Django for real-time accuracy without full page reload.
+                // For now, it counts unread items on the current page.
+                const unreadItems = document.querySelectorAll('.notification-item.unread').length;
+                const badge = document.querySelector('.badge');
+                if (badge) {
+                    badge.textContent = unreadItems;
+                    badge.style.display = unreadItems > 0 ? 'block' : 'none';
+                }
+            }
+
+            // Initial update of the badge on page load
+            updateUnreadCountDisplay();
+        });
+    </script>
+</body>
+</html>

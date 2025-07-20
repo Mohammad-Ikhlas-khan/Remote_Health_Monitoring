@@ -1,0 +1,60 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Patient Details - MediDash Admin</title>
+    <link rel="stylesheet" href="{% static 'styles/patient.css' %}">
+</head>
+<body>
+    <div class="header">
+        <header class="header-container">
+            <div class="logoside">
+                <img src="{% static 'images/logo.png' %}" alt="logo" loading="lazy">
+            </div>
+            <div class="main-nav" id="navMenu">
+                <a href="{% url 'admin_dashboard' %}">Home</a>
+                <a href="{% url 'admin_view_records' %}" class="active">Records</a>
+                <a href="{% url 'admin_notifications' %}">Notifications</a>
+                <a href="{% url 'admin_settings' %}">Settings</a>
+            </div>
+            <div class="rightside">
+                <span class="badge">{{ unread_notifications_count }}</span>
+                <img src="{{ profile_pic_url }}" alt="Profile Picture" class="profile-pic">
+                <span class="admin-name">{{ username }}</span>
+            </div>
+        </header>
+    </div>
+    <div class="main-container">
+        <h1>Patient Details</h1>
+        <div class="patient-card">
+            {% if patient.profile_picture and patient.profile_picture.url %}
+                <img src="{{ patient.profile_picture.url }}" alt="Patient Profile" class="patient-pic">
+            {% else %}
+                <img src="https://placehold.co/80x80/f0f4f7/556080?text=PT" alt="Patient Profile" class="patient-pic">
+            {% endif %}
+            <div class="patient-name">{{ patient.user.first_name }} {{ patient.user.last_name }}</div>
+            <div class="patient-info">Gender: {{ patient.gender|capfirst|default:'N/A' }}</div>
+            <div class="patient-info">Date of Birth: {{ patient.date_of_birth|date:'M d, Y'|default:'N/A' }}</div>
+            <div class="patient-info">Contact: {{ patient.contact_number|default:'N/A' }}</div>
+            <div class="patient-info">Status: {{ patient.status|default:'N/A' }}</div>
+        </div>
+        {% if devices %}
+        <div class="assigned-devices" style="margin-top: 2rem;">
+            <h2>Assigned Devices</h2>
+            <ul>
+                {% for device in devices %}
+                <li><strong>{{ device.device_name }}</strong> ({{ device.device_type }}) - MAC: {{ device.mac_address }}</li>
+                {% endfor %}
+            </ul>
+        </div>
+        {% else %}
+        <div class="assigned-devices" style="margin-top: 2rem; color: #888;">
+            <h2>Assigned Devices</h2>
+            <p>No devices assigned to this patient.</p>
+        </div>
+        {% endif %}
+    </div>
+</body>
+</html> 

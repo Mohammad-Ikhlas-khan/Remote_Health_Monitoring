@@ -1,0 +1,25 @@
+{% load static %}
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Enable 2FA</title>
+    <link rel="stylesheet" href="{% static 'styles/settings_doctor.css' %}">
+</head>
+<body>
+    <div class="main-content">
+        <h1>Enable Two-Factor Authentication</h1>
+        <form method="post" class="settings-section" style="max-width: 400px; margin: 0 auto;">
+            {% csrf_token %}
+            <label for="phone">Phone Number for 2FA:</label>
+            <input type="tel" id="phone" name="phone" required>
+            <label for="enable_2fa">Enable 2FA:</label>
+            <select id="enable_2fa" name="enable_2fa">
+                <option value="yes">Enable</option>
+                <option value="no">Disable</option>
+            </select>
+            <button type="submit" class="save-button">Save 2FA Settings</button>
+            <a href="{% url 'doctor_settings' %}" class="action-button">Cancel</a>
+        </form>
+    </div>
+</body>
+</html> 

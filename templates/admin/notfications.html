@@ -1,0 +1,198 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Notifications - MediDash</title>
+    <link rel="stylesheet" href="{% static 'styles/notifications.css' %}">
+</head>
+<body>
+    <!-- Header Nav bar Profile -->
+    <div class="header">
+       <header class="header-container">
+        <div class="logoside">
+            <img src="{% static 'innerimg/logo.png' %}" alt="logo" loading="lazy">
+        </div>
+        <div class="main-nav" id="navMenu">
+            <a href="{% url 'admin_dashboard' %}" id="home-a" >Home</a>
+            <a href="{% url 'admin_register_user' %}" id="patient-a" class="">Register Users</a>
+            <a href="{% url 'admin_view_records' %}" id="alert-a">View Records</a>
+            <a href="{% url 'admin_register_device' %}" id="device-a">Register Device</a>
+            <a href="{% url 'admin_settings' %}" id="setting-a">Settings</a>
+        </div>
+        <div class="rightside">
+            <a href="{% url 'admin_notifications' %}" class="notification active">Notifications 🔔</a>
+            <a href="{% url 'logout' %}" id="logout-a">Logout</a>
+            <a href="{% url 'admin_notifications' %}" class="m-notification">🔔 </a>
+            <span class="badge">{{ unread_notifications_count }}</span>
+            <button type="button" class="menu-button" onclick="toggleMenu()">
+                <img src="https://placehold.co/40x40/f0f4f7/556080?text=AD" alt="Profile Picture" class="profile-pic">
+            </button>
+            <span class="doctor-name">{{ request.user.first_name }} {{ request.user.last_name }}</span>
+        </div>
+       </header>
+    </div>
+
+    <div class="notifications-container">
+        <h1>Your Notifications</h1>
+        <form method="post" style="display:inline;">
+            {% csrf_token %}
+            <input type="hidden" name="remove_all" value="1">
+            <button type="submit" class="mark-all-read-btn">Mark All As Read</button>
+        </form>
+            {% for notification in notifications %}
+            <div class="notification-card">
+                <div class="notification-content">
+                    <div class="notification-title">{{ notification.title }}</div>
+                    <div class="notification-message">{{ notification.message }}</div>
+                    <div class="notification-date">{{ notification.timestamp|date:'M d, Y H:i' }}</div>
+                </div>
+                <div class="notification-actions">
+                    <form method="post" style="display:inline;">
+                        {% csrf_token %}
+                        <input type="hidden" name="notification_id" value="{{ notification.id }}">
+                        <button type="submit" name="mark_read" class="mark-read-btn">Mark as Read</button>
+                    </form>
+                </div>
+            </div>
+            {% empty %}
+            <div class="notification-card empty">No notifications found.</div>
+            {% endfor %}
+    </div>
+
+    <script>
+        // JavaScript for mobile menu toggle (same as admin-panel.html)
+        function toggleMenu() {
+            const nav = document.getElementById('navMenu');
+            const home = document.getElementById('home-a');
+            const patient = document.getElementById('patient-a');
+            const device = document.getElementById('device-a');
+            const Alert = document.getElementById('alert-a');
+            const setting = document.getElementById('setting-a');
+
+            if (window.innerWidth <= 900) {
+                nav.classList.toggle('show');
+                home.classList.toggle('show1');
+                patient.classList.toggle('show2');
+                Alert.classList.toggle('show3');
+                device.classList.toggle('showDevice');
+                setting.classList.toggle('show5');
+
+                if (nav.classList.contains('show')) {
+                    nav.style.display = 'flex';
+                    void nav.offsetWidth;
+                } else {
+                    nav.addEventListener('transitionend', () => {
+                        nav.style.display = 'none';
+                    }, { once: true });
+                }
+            }
+        }
+
+        function handleResize() {
+            const nav = document.getElementById('navMenu');
+            const home = document.getElementById('home-a');
+            const patient = document.getElementById('patient-a');
+            const device = document.getElementById('device-a');
+            const Alert = document.getElementById('alert-a');
+            const setting = document.getElementById('setting-a');
+
+            if (window.innerWidth > 900) {
+                nav.classList.remove('show');
+                nav.style.display = 'flex';
+                home.classList.remove('show1');
+                home.style.display = 'flex';
+                patient.classList.remove('show2');
+                patient.style.display = 'flex';
+                Alert.classList.remove('show3');
+                Alert.style.display = 'flex';
+                device.classList.remove('showDevice');
+                device.style.display = 'flex';
+                setting.classList.remove('show5');
+                setting.style.display = 'flex';
+            } else {
+                nav.style.display = nav.classList.contains('show') ? 'flex' : 'none';
+                home.style.display = nav.classList.contains('show') ? 'flex' : 'none';
+                patient.style.display = nav.classList.contains('show') ? 'flex' : 'none';
+                Alert.style.display = nav.classList.contains('show') ? 'flex' : 'none';
+                device.style.display = nav.classList.contains('show') ? 'flex' : 'none';
+                setting.style.display = nav.classList.contains('show') ? 'flex' : 'none';
+            }
+        }
+        window.addEventListener('resize', handleResize);
+        window.addEventListener('DOMContentLoaded', handleResize);
+
+
+        // DYNAMIC JAVASCRIPT LOGIC FOR NOTIFICATIONS (ADAPTED FOR DJANGO)
+        // This part needs AJAX or form submissions to update backend status
+        document.addEventListener('DOMContentLoaded', () => {
+            const markAllReadButton = document.getElementById('markAllReadButton');
+            const notificationList = document.getElementById('notificationList');
+
+            markAllReadButton.addEventListener('click', () => {
+                // In a real Django app, this would send an AJAX request to mark all as read
+                alert('Marking all notifications as read (frontend simulation).');
+                // You would typically reload the page or update UI based on successful AJAX response
+                location.reload(); // Simple reload for demonstration
+            });
+
+            notificationList.addEventListener('click', (event) => {
+                const target = event.target;
+                if (target.classList.contains('mark-read-btn')) {
+                    const notificationId = target.dataset.notificationId;
+                    alert(`Marking notification ${notificationId} as read (frontend simulation).`);
+                    // AJAX call to Django view to update notification status
+                    // After success, change button text/disable and update unread count
+                    target.textContent = 'Read';
+                    target.disabled = true;
+                    target.closest('.notification-item').classList.remove('unread');
+                    updateUnreadCountDisplay();
+                } else if (target.classList.contains('dismiss-btn')) {
+                    const notificationId = target.dataset.notificationId;
+                    alert(`Dismissing notification ${notificationId} (frontend simulation).`);
+                    // AJAX call to Django view to delete/dismiss notification
+                    target.closest('.notification-item').remove();
+                    updateUnreadCountDisplay();
+                }
+            });
+
+            // Function to update the unread count in the badge
+            function updateUnreadCountDisplay() {
+                const unreadItems = document.querySelectorAll('.notification-item.unread').length;
+                const badge = document.querySelector('.badge');
+                if (badge) {
+                    badge.textContent = unreadItems;
+                    badge.style.display = unreadItems > 0 ? 'block' : 'none';
+                }
+            }
+
+            // Initial update of the badge on page load
+            updateUnreadCountDisplay();
+        });
+
+        document.addEventListener('DOMContentLoaded', function() {
+            // Attach AJAX handler to all Mark as Read forms
+            document.querySelectorAll('.notification-actions form').forEach(function(form) {
+                var markReadBtn = form.querySelector('button[name="mark_read"]');
+                if (markReadBtn) {
+                    form.addEventListener('submit', function(e) {
+                        e.preventDefault();
+                        var card = form.closest('.notification-card');
+                        var formData = new FormData(form);
+                        fetch(window.location.href, {
+                            method: 'POST',
+                            headers: { 'X-Requested-With': 'XMLHttpRequest' },
+                            body: formData
+                        }).then(function(response) {
+                            if (response.ok) {
+                                if (card) card.remove();
+                            }
+                        });
+                    });
+                }
+            });
+        });
+    </script>
+</body>
+</html>

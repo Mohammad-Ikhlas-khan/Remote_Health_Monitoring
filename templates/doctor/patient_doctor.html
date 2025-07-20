@@ -1,0 +1,406 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Patient Details - MediDash</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{% static 'styles/patient_doctor.css' %}">
+     
+    <!-- Font Awesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <!-- Chart.js for graphs -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+     <!-- Header Nav bar Profile -->
+    <div class="header">
+       <header class="header-container">
+        <div class="logoside">
+            <img src="{% static 'innerimg/logo.png' %}" alt="logo" loading="lazy">
+        </div>
+        <div class="main-nav" id="navMenu">
+            <a href="{% url 'doctor_dashboard' %}" id="home-a" >Home</a>
+            <a href="{% url 'doctor_patients_list' %}" id="patient-a" class="active">Patients</a>
+            <a href="{% url 'doctor_alerts' %}" id="alert-a" >Alerts</a>
+            <a href="{% url 'doctor_reports' %}" id="reports-a">Reports</a>
+            <a href="{% url 'doctor_settings' %}" id="setting-a">Settings</a>
+        </div>
+        <div class="rightside">
+            <a href="{% url 'doctor_notifications' %}" class="notification">Notifications 🔔</a>
+            <a href="{% url 'logout' %}" id="logout-a">Logout</a>
+            <a href="{% url 'doctor_notifications' %}" class="m-notification">🔔 </a>
+            <span class="badge">{{ unread_notifications_count }}</span>
+            <button type="button" class="menu-button" onclick="toggleMenu()">
+                <img src="{{ profile_pic_url }}" alt="Profile Picture" class="profile-pic">
+            </button>
+            <span class="doctor-name">{{ request.user.first_name }} {{ request.user.last_name }}</span>
+        </div>
+       </header>
+    </div>
+
+    <div class="patient-details-container">
+        <h1>Patient Details: {{ patient.user.first_name }} {{ patient.user.last_name }}</h1>
+
+        <div class="patient-summary-cards">
+            <div class="card">
+                <h3>Gender</h3>
+                <p>{{ patient.gender|capfirst|default:"N/A" }}</p>
+            </div>
+            <div class="card">
+                <h3>Date of Birth</h3>
+                <p>{{ patient.date_of_birth|date:"M d, Y"|default:"N/A" }}</p>
+            </div>
+            <div class="card">
+                <h3>Blood Group</h3>
+                <p>{{ patient.blood_group|default:"N/A" }}</p>
+            </div>
+            <div class="card">
+                <h3>Contact Number</h3>
+                <p>{{ patient.contact_number|default:"N/A" }}</p>
+            </div>
+        </div>
+
+        <div class="tabs">
+            <button class="tab-button active" data-tab="MedicalHistory">Medical History</button>
+            <button class="tab-button" data-tab="Vitals">Vitals History</button>
+            <button class="tab-button" data-tab="Alerts">Alerts</button>
+            <button class="tab-button" data-tab="Reports">Reports</button>
+            <button class="tab-button" data-tab="Devices">Devices</button>
+            <button class="tab-button" data-tab="EmergencyInfo">Emergency Info</button>
+        </div>
+
+        <!-- Tab Content: Medical History -->
+        <div id="MedicalHistory" class="tabcontent active">
+            <h2>Medical History</h2>
+            <div class="record-list">
+                {% for record in medical_records %}
+                <div class="record-item">
+                    <h3>{{ record.title }} ({{ record.record_type|capfirst }}) - {{ record.record_date|date:"M d, Y" }}</h3>
+                    <p>{{ record.description }}</p>
+                    {% if record.document %}
+                    <a href="{{ record.document.url }}" target="_blank" class="download-link">Download Document</a>
+                    {% endif %}
+                </div>
+                {% empty %}
+                <p>No medical records found for this patient.</p>
+                {% endfor %}
+            </div>
+            <a href="{% url 'add_medical_record' patient.user.id %}" class="action-button">Add New Record</a>
+        </div>
+
+        <!-- Tab Content: Vitals History -->
+        <div id="Vitals" class="tabcontent">
+            <h2>Vitals History</h2>
+            <div class="chart-container">
+                <canvas id="vitalsChart"></canvas>
+            </div>
+            <div class="table-responsive">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Date & Time</th>
+                            <th>Vital Sign</th>
+                            <th>Value</th>
+                            <th>Unit</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for vital in vitals %}
+                        <tr>
+                            <td>{{ vital.timestamp|date:"M d, Y H:i" }}</td>
+                            <td>{{ vital.vital_type|capfirst }}</td>
+                            <td>{{ vital.value }}</td>
+                            <td>{{ vital.unit|default:"N/A" }}</td>
+                            <td>{{ vital.status|default:"N/A" }}</td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="5">No vital records found for this patient.</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Tab Content: Alerts -->
+        <div id="Alerts" class="tabcontent">
+            <h2>Alerts</h2>
+            <div class="alert-list">
+                {% for alert in alerts %}
+                <div class="alert-item">
+                    <h3>{{ alert.alert_type|capfirst }} (Severity: {{ alert.severity|capfirst }}) - {{ alert.timestamp|date:"M d, Y H:i" }}</h3>
+                    <p>{{ alert.message }}</p>
+                    <p>Status: <span class="status-{{ alert.status }}">{{ alert.status|capfirst }}</span></p>
+                    <button class="action-button">View Details</button>
+                </div>
+                {% empty %}
+                <p>No alerts found for this patient.</p>
+                {% endfor %}
+            </div>
+        </div>
+
+        <!-- Tab Content: Reports -->
+        <div id="Reports" class="tabcontent">
+            <h2>Medical Reports</h2>
+            <div class="record-list">
+                {% for report in reports %}
+                <div class="record-item">
+                    <h3>{{ report.title }} - {{ report.report_date|date:"M d, Y" }}</h3>
+                    <p><strong>Chief Complaint:</strong> {{ report.chief_complaint|default:"N/A" }}</p>
+                    <p><strong>Diagnosis:</strong> {{ report.diagnosis|default:"N/A" }}</p>
+                    <p><strong>Treatment Plan:</strong> {{ report.treatment_plan|default:"N/A" }}</p>
+                    <button class="action-button">View Full Report</button>
+                </div>
+                {% empty %}
+                <p>No medical reports found for this patient.</p>
+                {% endfor %}
+            </div>
+            <a href="{% url 'doctor_reports' %}" class="action-button">Generate New Report</a>
+        </div>
+
+        <!-- Tab Content: Devices -->
+        <div id="Devices" class="tabcontent">
+            <h2>Registered Devices</h2>
+            <div class="device-list">
+                {% for device in patient.devices.all %} {# Assuming a related_name 'devices' on Device model #}
+                <div class="device-item">
+                    <h3>{{ device.device_type }} (Serial: {{ device.serial_number }})</h3>
+                    <p>Registered On: {{ device.registration_date|date:"M d, Y" }}</p>
+                    <p>Status: {% if device.is_active %}Active{% else %}Inactive{% endif %}</p>
+                    <p>Last Sync: {{ device.last_data_sync|date:"M d, Y H:i"|default:"N/A" }}</p>
+                    <a href="/device/{{ device.id }}/" class="action-button">View Device Data</a>
+                </div>
+                {% empty %}
+                <p>No devices registered for this patient.</p>
+                {% endfor %}
+            </div>
+        </div>
+
+        <!-- Tab Content: Emergency Info -->
+        <div id="EmergencyInfo" class="tabcontent">
+            <h2>Emergency Information</h2>
+            <div class="emergency-details">
+                <p><strong>Emergency Contact Name:</strong> {{ patient.emergency_contact_name|default:"N/A" }}</p>
+                <p><strong>Relationship:</strong> {{ patient.emergency_contact_relationship|default:"N/A" }}</p>
+                <p><strong>Phone:</strong> {{ patient.emergency_contact_phone|default:"N/A" }}</p>
+                <p><strong>Medical History Summary:</strong> {{ patient.medical_history|default:"N/A" }}</p>
+            </div>
+            <a href="{% url 'edit_emergency_info' patient.user.id %}" class="action-button">Edit Emergency Info</a>
+        </div>
+    </div>
+
+    <script>
+        // JavaScript for mobile menu toggle (consistent with doctor.html)
+        function toggleMenu() {
+            const nav = document.getElementById('navMenu');
+            const home = document.getElementById('home-a');
+            const patient = document.getElementById('patient-a');
+            const Alert = document.getElementById('alert-a');
+            const reports = document.getElementById('reports-a');
+            const setting = document.getElementById('setting-a');
+
+            if (window.innerWidth <= 986) {
+                nav.classList.toggle('show');
+                home.classList.toggle('show1');
+                patient.classList.toggle('show2');
+                Alert.classList.toggle('show3');
+                reports.classList.toggle('show4');
+                setting.classList.toggle('show5');
+
+                if (nav.classList.contains('show')) {
+                    nav.style.display = 'flex';
+                    void nav.offsetWidth;
+                } else {
+                    nav.addEventListener('transitionend', () => {
+                        nav.style.display = 'none';
+                    }, { once: true });
+                }
+            }
+        }
+
+        // Handle resize event to adjust menu display (consistent with doctor.html)
+        function handleResize() {
+            const nav = document.getElementById('navMenu');
+            const home = document.getElementById('home-a');
+            const patient = document.getElementById('patient-a');
+            const Alert = document.getElementById('alert-a');
+            const reports = document.getElementById('reports-a');
+            const setting = document.getElementById('setting-a');
+
+            if (window.innerWidth > 986) {
+                nav.classList.remove('show');
+                nav.style.display = 'flex';
+                home.classList.remove('show1');
+                home.style.display = 'flex';
+                patient.classList.remove('show2');
+                patient.style.display = 'flex';
+                Alert.classList.remove('show3');
+                Alert.style.display = 'flex';
+                reports.classList.remove('show4');
+                reports.style.display = 'flex';
+                setting.classList.remove('show5');
+                setting.style.display = 'flex';
+            } else {
+                nav.style.display = nav.classList.contains('show') ? 'flex' : 'none';
+                home.style.display = home.classList.contains('show1') ? 'flex' : 'none';
+                patient.style.display = patient.classList.contains('show2') ? 'flex' : 'none';
+                Alert.style.display = Alert.classList.contains('show3') ? 'flex' : 'none';
+                reports.style.display = reports.classList.contains('show4') ? 'flex' : 'none';
+                setting.style.display = setting.classList.contains('show5') ? 'flex' : 'none';
+            }
+        }
+        window.addEventListener('resize', handleResize);
+        window.addEventListener('DOMContentLoaded', handleResize);
+
+        // JavaScript for Tab Switching
+        document.addEventListener('DOMContentLoaded', function() {
+            const tabButtons = document.querySelectorAll('.tab-button');
+            const tabContents = document.querySelectorAll('.tabcontent');
+            let openTabId = null;
+
+            tabButtons.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const tabName = btn.getAttribute('data-tab');
+                    const content = document.getElementById(tabName);
+                    const isActive = btn.classList.contains('active');
+
+                    // Hide all tabs and remove active from all buttons
+                    tabContents.forEach(tc => tc.style.display = 'none');
+                    tabButtons.forEach(b => b.classList.remove('active'));
+
+                    if (!isActive) {
+                        content.style.display = 'block';
+                        btn.classList.add('active');
+                        openTabId = tabName;
+                    } else {
+                        // If already open, close it
+                        openTabId = null;
+                    }
+                });
+            });
+
+            // Show the first tab by default
+            if (tabButtons.length > 0) {
+                tabButtons[0].click();
+            }
+        });
+
+        // Data for Chart.js (from Django context)
+        const vitalsDataForChart = [
+            {% for vital in vitals %}
+            {
+                timestamp: new Date("{{ vital.timestamp|date:'Y-m-d H:i:s' }}"),
+                type: "{{ vital.vital_type }}",
+                value: {{ vital.value }}
+            },
+            {% endfor %}
+        ];
+
+        let vitalsChartInstance = null; // To store chart instance
+
+        function renderVitalsChart() {
+            const ctx = document.getElementById('vitalsChart').getContext('2d');
+
+            if (vitalsChartInstance) {
+                vitalsChartInstance.destroy(); // Destroy existing chart before creating new one
+            }
+
+            // Group data by vital type
+            const groupedData = vitalsDataForChart.reduce((acc, vital) => {
+                if (!acc[vital.type]) {
+                    acc[vital.type] = [];
+                }
+                acc[vital.type].push(vital);
+                return acc;
+            }, {});
+
+            const datasets = Object.keys(groupedData).map(type => {
+                // Sort by timestamp for proper line drawing
+                const sortedVitals = groupedData[type].sort((a, b) => a.timestamp - b.timestamp);
+                return {
+                    label: type.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase()), // Format label nicely
+                    data: sortedVitals.map(v => v.value),
+                    borderColor: getRandomColor(), // Dynamic color
+                    tension: 0.1,
+                    fill: false,
+                    pointRadius: 3,
+                    pointHoverRadius: 5,
+                    pointHitRadius: 10,
+                    pointBackgroundColor: 'white',
+                    pointBorderWidth: 1,
+                    pointBorderColor: getRandomColor()
+                };
+            });
+
+            // Prepare labels (dates)
+            const labels = [...new Set(vitalsDataForChart.map(v => v.timestamp.toLocaleDateString()))].sort(); // Unique sorted dates
+
+            vitalsChartInstance = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: datasets
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false, // Allow canvas to resize
+                    scales: {
+                        x: {
+                            type: 'category', // Use 'category' for discrete string labels
+                            title: {
+                                display: true,
+                                text: 'Date'
+                            }
+                        },
+                        y: {
+                            beginAtZero: true,
+                            title: {
+                                display: true,
+                                text: 'Value'
+                            }
+                        }
+                    },
+                    plugins: {
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    return `${context.dataset.label}: ${context.raw} ${getUnitForVitalType(context.dataset.label)}`;
+                                }
+                            }
+                        },
+                        legend: {
+                            display: true,
+                            position: 'top',
+                        }
+                    }
+                }
+            });
+        }
+
+        function getRandomColor() {
+            const letters = '0123456789ABCDEF';
+            let color = '#';
+            for (let i = 0; i < 6; i++) {
+                color += letters[Math.floor(Math.random() * 16)];
+            }
+            return color;
+        }
+
+        function getUnitForVitalType(vitalType) {
+            // Simple mapping, expand as needed
+            switch (vitalType.toLowerCase()) {
+                case 'heart rate': return 'bpm';
+                case 'blood pressure': return 'mmHg';
+                case 'temperature': return '°C';
+                case 'oxygen saturation': return '%';
+                case 'glucose level': return 'mg/dL';
+                default: return '';
+            }
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,89 @@
+{% load static %}
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Add Medical Record</title>
+    <link rel="stylesheet" href="{% static 'styles/patient_doctor.css' %}">
+    <style>
+        .add-record-form {
+            max-width: 520px;
+            margin: 48px auto 0 auto;
+            background: #fff;
+            border-radius: 18px;
+            box-shadow: 0 8px 32px rgba(34,48,70,0.13);
+            padding: 48px 40px 40px 40px;
+            display: flex;
+            flex-direction: column;
+            align-items: stretch;
+        }
+        .add-record-form h1 {
+            font-size: 2.1rem;
+            font-weight: 800;
+            color: #223046;
+            margin-bottom: 28px;
+            text-align: center;
+        }
+        .add-record-form label {
+            font-weight: 600;
+            color: #223046;
+            margin-bottom: 6px;
+            margin-top: 16px;
+        }
+        .add-record-form input[type="text"],
+        .add-record-form input[type="date"],
+        .add-record-form select,
+        .add-record-form textarea {
+            width: 100%;
+            padding: 10px 12px;
+            border-radius: 6px;
+            border: 1.5px solid #d1e3f0;
+            font-size: 1.08rem;
+            margin-bottom: 2px;
+            background: #f7fafc;
+            color: #223046;
+            transition: border 0.2s;
+        }
+        .add-record-form input:focus,
+        .add-record-form textarea:focus,
+        .add-record-form select:focus {
+            border: 1.5px solid #3498db;
+            outline: none;
+        }
+        .add-record-form .form-actions {
+            display: flex;
+            gap: 18px;
+            margin-top: 28px;
+            justify-content: center;
+        }
+        .add-record-form .action-button {
+            min-width: 100px;
+            padding: 10px 0;
+            font-size: 1.08rem;
+        }
+    </style>
+</head>
+<body>
+    <form method="post" class="add-record-form">
+        <h1>Add Medical Record</h1>
+        {% csrf_token %}
+        <label>Record Type:</label>
+        <select name="record_type" required>
+            <option value="">Select Type</option>
+            <option value="prescription">Prescription</option>
+            <option value="lab_result">Lab Result</option>
+            <option value="diagnosis">Diagnosis</option>
+            <option value="consultation_note">Consultation Note</option>
+        </select>
+        <label>Date:</label>
+        <input type="date" name="record_date" value="" required>
+        <label>Title:</label>
+        <input type="text" name="title" required>
+        <label>Description:</label>
+        <textarea name="description" rows="4" required></textarea>
+        <div class="form-actions">
+            <button type="submit" class="action-button">Save</button>
+            <a href="{% url 'doctor_patient_detail' patient.user.id %}" class="action-button">Cancel</a>
+        </div>
+    </form>
+</body>
+</html> 

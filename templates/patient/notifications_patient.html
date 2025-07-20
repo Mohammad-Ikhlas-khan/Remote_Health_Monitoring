@@ -1,0 +1,350 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Notifications - Patient Portal</title>
+    <!-- Inter Font -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{% static 'styles/notification_patient.css' %}">
+</head>
+<body>
+    <!-- Header Nav bar Profile -->
+    <div class="header">
+       <header class="header-container">
+        <div class="logoside">
+            <img src="{% static 'images/logo.png' %}" alt="logo" loading="lazy">
+        </div>
+        <div class="main-nav" id="navMenu">
+                    <a href="{% url 'patient_dashboard' %}" id="home-a" >Home</a>
+                    <a href="{% url 'patient_vitals_history' %}" id="alert-a" >Vitals History</a>
+                    <a href="{% url 'patient_health_records' %}" id="patient-a">Health Records</a>
+                    <a href="{% url 'patient_messages' %}" id="reports-a">Messages</a></li>
+                    <a href="{% url 'patient_profile' %}" id="setting-a"  >Profile</a>
+            
+        </div>
+        <div class="rightside">
+            <a href="{% url 'patient_notifications' %}" class="notification  active">Notifications 🔔</a>
+            <a href="{% url 'logout' %}" id="logout-a">Logout</a>
+            <a href="{% url 'patient_notifications' %}" class="m-notification"  active>🔔 </a>
+            <span class="badge">{{ unread_notifications_count }}</span>
+            <button type="button" class="menu-button" onclick="toggleMenu()">
+                <img src="{{ profile_pic_url }}" alt="Profile Picture" class="profile-pic">
+            </button>
+            <span class="patient-name">{{ request.user.first_name }} {{ request.user.last_name }}</span>
+        </div>
+       </header>
+    </div>
+
+    <div class="main-content">
+        <h1>Your Notifications</h1>
+
+        <div class="notifications-actions">
+            <div class="filters">
+                <input type="text" id="notificationSearchInput" placeholder="Search notifications..." onkeyup="applyNotificationsFilters()">
+                <select id="notificationTypeFilter" onchange="applyNotificationsFilters()">
+                    <option value="">All Types</option>
+                    <option value="info">Information</option>
+                    <option value="warning">Warning</option>
+                    <option value="success">Success</option>
+                    <option value="error">Error</option>
+                </select>
+                <select id="notificationStatusFilter" onchange="applyNotificationsFilters()">
+                    <option value="">All Statuses</option>
+                    <option value="unread">Unread</option>
+                    <option value="read">Read</option>
+                </select>
+                <button class="action-button" id="applyNotificationFiltersButton">Apply Filters</button>
+                <button class="action-button" id="resetNotificationFiltersButton">Reset Filters</button>
+            </div>
+            <button id="markAllReadButton" class="action-button">Mark All As Read</button>
+        </div>
+
+        <div class="notification-list-container">
+            <div class="notification-list" id="notificationList">
+                {% for notification in notifications %}
+                <div class="notification-item {% if not notification.is_read %}unread{% endif %}" data-notification-id="{{ notification.id }}" data-type="{{ notification.notification_type }}" data-status="{% if notification.is_read %}read{% else %}unread{% endif %}">
+                    <div class="notification-header">
+                        <span class="notification-type">{{ notification.notification_type|capfirst }}</span>
+                        <span class="notification-date">{{ notification.timestamp|date:"M d, Y H:i" }}</span>
+                    </div>
+                    <div class="notification-body">
+                        <p>{{ notification.message }}</p>
+                    </div>
+                    <div class="notification-actions">
+                        {% if not notification.is_read %}
+                            <button class="mark-read-btn" data-notification-id="{{ notification.id }}">Mark as Read</button>
+                        {% else %}
+                            <button class="mark-read-btn" data-notification-id="{{ notification.id }}" disabled>Read</button>
+                        {% endif %}
+                        <button class="dismiss-btn" data-notification-id="{{ notification.id }}">Dismiss</button>
+                    </div>
+                </div>
+                {% empty %}
+                <p class="no-notifications">No notifications found.</p>
+                {% endfor %}
+            </div>
+        </div>
+
+        <div class="pagination">
+            <button id="prevNotificationsPageButton" disabled>&laquo; Previous</button>
+            <span id="notificationPageInfo">Page 1 of 1</span>
+            <button id="nextNotificationsPageButton" disabled>Next &raquo;</button>
+        </div>
+    </div>
+
+    <script>
+        // JavaScript for mobile menu toggle (consistent with patient_dashboard.html)
+        function toggleMenu() {
+            const nav = document.getElementById('navMenu');
+            const home = document.getElementById('home-a');
+            const vitals = document.getElementById('alert-a'); // Vitals History
+            const records = document.getElementById('patient-a'); // Health Records
+            const messages = document.getElementById('reports-a'); // Messages
+            const profile = document.getElementById('setting-a'); // Profile
+
+            if (window.innerWidth <= 900) { // Keep consistent breakpoint for menu
+                nav.classList.toggle('show');
+                home.classList.toggle('show1');
+                vitals.classList.toggle('show2');
+                records.classList.toggle('show3');
+                messages.classList.toggle('show4');
+                profile.classList.toggle('show5');
+
+                if (nav.classList.contains('show')) {
+                    nav.style.display = 'flex';
+                    void nav.offsetWidth;
+                } else {
+                    nav.addEventListener('transitionend', () => {
+                        nav.style.display = 'none';
+                    }, { once: true });
+                }
+            }
+        }
+
+        function handleResize() {
+            const nav = document.getElementById('navMenu');
+            const home = document.getElementById('home-a');
+            const vitals = document.getElementById('alert-a');
+            const records = document.getElementById('patient-a');
+            const messages = document.getElementById('reports-a');
+            const profile = document.getElementById('setting-a');
+
+            if (window.innerWidth > 900) { // Keep consistent breakpoint for menu
+                nav.classList.remove('show');
+                nav.style.display = 'flex';
+                home.classList.remove('show1');
+                home.style.display = 'flex';
+                vitals.classList.remove('show2');
+                vitals.style.display = 'flex';
+                records.classList.remove('show3');
+                records.style.display = 'flex';
+                messages.classList.remove('show4');
+                messages.style.display = 'flex';
+                profile.classList.remove('show5');
+                profile.style.display = 'flex';
+            } else {
+                nav.style.display = nav.classList.contains('show') ? 'flex' : 'none';
+                home.style.display = home.classList.contains('show1') ? 'flex' : 'none';
+                vitals.style.display = vitals.classList.contains('show2') ? 'flex' : 'none';
+                records.style.display = records.classList.contains('show3') ? 'flex' : 'none';
+                messages.style.display = messages.classList.contains('show4') ? 'flex' : 'none';
+                profile.style.display = profile.classList.contains('show5') ? 'flex' : 'none';
+            }
+        }
+        window.addEventListener('resize', handleResize);
+        window.addEventListener('DOMContentLoaded', handleResize);
+
+        // --- Notification Logic ---
+        const allNotificationsData = [
+            {% for notification in notifications %}
+            {
+                id: {{ notification.id }},
+                message: "{{ notification.message|escapejs }}",
+                notification_type: "{{ notification.notification_type }}",
+                timestamp: "{{ notification.timestamp|date:'Y-m-d H:i' }}",
+                is_read: {{ notification.is_read|yesno:"true,false" }}
+            },
+            {% endfor %}
+        ];
+
+        let filteredNotificationsData = [...allNotificationsData];
+        let currentNotificationsPage = 1;
+        const notificationsPerPage = 10; // Number of notifications per page
+
+        const notificationListContainer = document.getElementById('notificationList');
+        const notificationSearchInput = document.getElementById('notificationSearchInput');
+        const notificationTypeFilter = document.getElementById('notificationTypeFilter');
+        const notificationStatusFilter = document.getElementById('notificationStatusFilter');
+        const applyNotificationFiltersButton = document.getElementById('applyNotificationFiltersButton');
+        const resetNotificationFiltersButton = document.getElementById('resetNotificationFiltersButton');
+        const markAllReadButton = document.getElementById('markAllReadButton');
+        const prevNotificationsPageButton = document.getElementById('prevNotificationsPageButton');
+        const nextNotificationsPageButton = document.getElementById('nextNotificationsPageButton');
+        const notificationPageInfo = document.getElementById('notificationPageInfo');
+        const unreadNotificationCountBadge = document.querySelector('.badge');
+
+
+        function renderNotifications() {
+            notificationListContainer.innerHTML = ''; // Clear existing notifications
+
+            if (filteredNotificationsData.length === 0) {
+                notificationListContainer.innerHTML = '<p class="no-notifications">No notifications found with current filters.</p>';
+                notificationPageInfo.textContent = 'Page 0 of 0';
+                prevNotificationsPageButton.disabled = true;
+                nextNotificationsPageButton.disabled = true;
+                return;
+            }
+
+            // Sort notifications by timestamp, most recent first
+            const sortedNotifications = filteredNotificationsData.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+
+            const startIndex = (currentNotificationsPage - 1) * notificationsPerPage;
+            const endIndex = startIndex + notificationsPerPage;
+            const notificationsToDisplay = sortedNotifications.slice(startIndex, endIndex);
+
+            notificationsToDisplay.forEach(notif => {
+                const notificationItem = document.createElement('div');
+                notificationItem.classList.add('notification-item');
+                if (!notif.is_read) {
+                    notificationItem.classList.add('unread');
+                }
+                notificationItem.dataset.notificationId = notif.id;
+                notificationItem.dataset.type = notif.notification_type;
+                notificationItem.dataset.status = notif.is_read ? 'read' : 'unread';
+
+                notificationItem.innerHTML = `
+                    <div class="notification-header">
+                        <span class="notification-type">${notif.notification_type.charAt(0).toUpperCase() + notif.notification_type.slice(1)}</span>
+                        <span class="notification-date">${new Date(notif.timestamp).toLocaleDateString()} ${new Date(notif.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
+                    </div>
+                    <div class="notification-body">
+                        <p>${notif.message}</p>
+                    </div>
+                    <div class="notification-actions">
+                        <button class="mark-read-btn" data-notification-id="${notif.id}" ${notif.is_read ? 'disabled' : ''}>${notif.is_read ? 'Read' : 'Mark as Read'}</button>
+                        <button class="dismiss-btn" data-notification-id="${notif.id}">Dismiss</button>
+                    </div>
+                `;
+                notificationListContainer.appendChild(notificationItem);
+            });
+
+            updatePaginationControls(filteredNotificationsData.length);
+            addNotificationActionListeners(); // Re-attach listeners after rendering
+            updateUnreadCountBadge();
+        }
+
+        function updatePaginationControls(totalNotifications) {
+            const totalPages = Math.ceil(totalNotifications / notificationsPerPage);
+            notificationPageInfo.textContent = `Page ${currentNotificationsPage} of ${totalPages}`;
+            prevNotificationsPageButton.disabled = currentNotificationsPage === 1;
+            nextNotificationsPageButton.disabled = currentNotificationsPage === totalPages || totalPages === 0;
+        }
+
+        function applyNotificationsFilters() {
+            const searchTerm = notificationSearchInput.value.toLowerCase();
+            const typeFilterValue = notificationTypeFilter.value;
+            const statusFilterValue = notificationStatusFilter.value;
+
+            filteredNotificationsData = allNotificationsData.filter(notif => {
+                const matchesSearch = notif.message.toLowerCase().includes(searchTerm) ||
+                                      notif.notification_type.toLowerCase().includes(searchTerm);
+                const matchesType = typeFilterValue === '' || notif.notification_type === typeFilterValue;
+                const matchesStatus = statusFilterValue === '' || 
+                                      (statusFilterValue === 'unread' && !notif.is_read) ||
+                                      (statusFilterValue === 'read' && notif.is_read);
+                return matchesSearch && matchesType && matchesStatus;
+            });
+            currentNotificationsPage = 1; // Reset to first page after filtering
+            renderNotifications();
+        }
+
+        function resetNotificationsFilters() {
+            notificationSearchInput.value = '';
+            notificationTypeFilter.value = '';
+            notificationStatusFilter.value = '';
+            applyNotificationsFilters(); // Re-apply filters with empty values
+        }
+
+        function markNotificationAsRead(notificationId) {
+            const notificationIndex = allNotificationsData.findIndex(n => n.id === notificationId);
+            if (notificationIndex !== -1 && !allNotificationsData[notificationIndex].is_read) {
+                allNotificationsData[notificationIndex].is_read = true; // Update local data
+                alert('Notification marked as read (Simulated).');
+                // In a real app, send AJAX POST to Django to update status
+                // After successful AJAX, re-render alerts or update specific item
+                applyNotificationsFilters(); // Re-render to update UI
+            }
+        }
+
+        function dismissNotification(notificationId) {
+            const notificationIndex = allNotificationsData.findIndex(n => n.id === notificationId);
+            if (notificationIndex !== -1) {
+                allNotificationsData.splice(notificationIndex, 1); // Remove from local data
+                alert('Notification dismissed (Simulated).');
+                // In a real app, send AJAX POST to Django to delete notification
+                applyNotificationsFilters(); // Re-render to update UI
+            }
+        }
+
+        function addNotificationActionListeners() {
+            document.querySelectorAll('.mark-read-btn').forEach(btn => {
+                btn.onclick = (e) => {
+                    e.stopPropagation();
+                    markNotificationAsRead(parseInt(e.currentTarget.dataset.notificationId));
+                };
+            });
+
+            document.querySelectorAll('.dismiss-btn').forEach(btn => {
+                btn.onclick = (e) => {
+                    e.stopPropagation();
+                    if (confirm('Are you sure you want to dismiss this notification?')) {
+                        dismissNotification(parseInt(e.currentTarget.dataset.notificationId));
+                    }
+                };
+            });
+        }
+
+        function updateUnreadCountBadge() {
+            const unreadCount = allNotificationsData.filter(notif => !notif.is_read).length;
+            if (unreadNotificationCountBadge) {
+                unreadNotificationCountBadge.textContent = unreadCount;
+                unreadNotificationCountBadge.style.display = unreadCount > 0 ? 'block' : 'none';
+            }
+        }
+
+        markAllReadButton.addEventListener('click', () => {
+            allNotificationsData.forEach(notif => {
+                notif.is_read = true;
+            });
+            alert('All notifications marked as read (Simulated).');
+            applyNotificationsFilters(); // Re-render to update UI
+        });
+
+        // Event Listeners for Filters and Pagination
+        applyNotificationFiltersButton.addEventListener('click', applyNotificationsFilters);
+        resetNotificationFiltersButton.addEventListener('click', resetNotificationsFilters);
+
+        prevNotificationsPageButton.addEventListener('click', () => {
+            if (currentNotificationsPage > 1) {
+                currentNotificationsPage--;
+                renderNotifications();
+            }
+        });
+
+        nextNotificationsPageButton.addEventListener('click', () => {
+            const totalPages = Math.ceil(filteredNotificationsData.length / notificationsPerPage);
+            if (currentNotificationsPage < totalPages) {
+                currentNotificationsPage++;
+                renderNotifications();
+            }
+        });
+
+        // Initial render on page load
+        document.addEventListener('DOMContentLoaded', () => {
+            renderNotifications();
+        });
+    </script>
+</body>
+</html>

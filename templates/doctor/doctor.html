@@ -1,0 +1,201 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Welcome Doctor - MediDash</title>
+    <link rel="stylesheet" href="{% static 'styles/doctor.css' %}">
+</head>
+<body>
+    <!-- Header Nav bar Profile -->
+    <div class="header">
+       <header class="header-container">
+        <div class="logoside">
+            <img src="{% static 'innerimg/logo.png' %}" alt="logo" loading="lazy">
+        </div>
+        <div class="main-nav" id="navMenu">
+            <a href="{% url 'doctor_dashboard' %}" id="home-a" class="active">Home</a>
+            <a href="{% url 'doctor_patients_list' %}" id="patient-a">Patients</a>
+            <a href="{% url 'doctor_alerts' %}" id="alert-a">Alerts</a>
+            <a href="{% url 'doctor_reports' %}" id="reports-a">Reports</a>
+            <a href="{% url 'doctor_settings' %}" id="setting-a">Settings</a>
+        </div>
+        <div class="rightside">
+            <a href="{% url 'doctor_notifications' %}" class="notification">Notifications 🔔</a>
+            <a href="{% url 'logout' %}" id="logout-a">Logout</a>
+            <a href="{% url 'doctor_notifications' %}" class="m-notification">🔔 </a>
+            <span class="badge">{{ unread_notifications_count }}</span>
+            <button type="button" class="menu-button" onclick="toggleMenu()">
+                <img src="{{ profile_pic_url }}" alt="Profile Picture" class="profile-pic">
+            </button>
+            <span class="doctor-name">{{ request.user.first_name }} {{ request.user.last_name }}</span>
+        </div>
+       </header>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-content">
+        <div class="greeting-section">
+            <h1 id="greeting">{{ greeting_text }}</h1>
+            <p>Welcome to your doctor's dashboard.</p>
+        </div>
+
+        <!-- Unassigned Patients Section -->
+        <div class="unassigned-patients-section" style="margin-bottom:2rem;">
+            <h2>Assign Yourself to a Patient</h2>
+            {% if unassigned_patients %}
+            <form method="post" class="mb-3">
+                {% csrf_token %}
+                <div class="mb-3">
+                    <label for="assign_patient_id" class="form-label">Select Unassigned Patient</label>
+                    <select name="assign_patient_id" id="assign_patient_id" class="form-select" required>
+                        <option value="">-- Select Patient --</option>
+                        {% for patient in unassigned_patients %}
+                            <option value="{{ patient.pk }}">{{ patient.user.get_full_name }} ({{ patient.user.email }})</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <button type="submit" class="btn btn-success">Assign Me</button>
+            </form>
+            {% else %}
+                <p>All patients are already assigned to doctors.</p>
+            {% endif %}
+        </div>
+
+        <div class="summary-cards">
+            <div class="card">
+                <h3>Total Patients</h3>
+                <p>{{ total_patients }}</p> <!-- Dynamic count from Django view -->
+            </div>
+            <div class="card">
+                <h3>Pending Alerts</h3>
+                <p>{{ pending_alerts }}</p> <!-- Dynamic count from Django view -->
+            </div>
+            <div class="card">
+                <h3>Upcoming Appointments</h3>
+                <p>N/A</p> <!-- Placeholder, needs appointment model/logic -->
+            </div>
+            <div class="card">
+                <h3>Messages</h3>
+                <p>{{ unread_notifications_count }}</p> <!-- Re-using notification count for unread messages placeholder -->
+            </div>
+        </div>
+
+        <div class="recent-activities">
+            <h2>Recent Alerts</h2>
+            <div class="activity-list">
+                {% if recent_alerts %}
+                    {% for alert in recent_alerts %}
+                    <div class="activity-item">
+                        <p><strong>Patient:</strong> {{ alert.patient.user.first_name }} {{ alert.patient.user.last_name }}</p>
+                        <p><strong>Alert:</strong> {{ alert.message }}</p>
+                        <p><strong>Time:</strong> {{ alert.timestamp|date:"M d, Y H:i" }}</p>
+                        <a href="{% url 'doctor_alerts' %}" class="view-details-button">View All Alerts</a>
+                    </div>
+                    {% endfor %}
+                {% else %}
+                    <p>No recent alerts.</p>
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="quick-actions">
+            <h2>Quick Actions</h2>
+            <ul>
+                <li><a href="{% url 'doctor_patients_list' %}" class="button">View All Patients</a></li>
+                <li><a href="{% url 'doctor_alerts' %}" class="button">Manage Alerts</a></li>
+                <li><a href="{% url 'doctor_reports' %}" class="button">Generate Reports</a></li>
+                <li><a href="{% url 'doctor_notifications' %}" class="button">Check Notifications</a></li>
+            </ul>
+        </div>
+    </div>
+
+    <script>
+        // JavaScript for mobile menu toggle (unchanged from original)
+        function toggleMenu() {
+            const nav = document.getElementById('navMenu');
+            const home = document.getElementById('home-a');
+            const patient = document.getElementById('patient-a');
+            const Alert = document.getElementById('alert-a');
+            const reports = document.getElementById('reports-a');
+            const setting = document.getElementById('setting-a');
+
+            if (window.innerWidth <= 986) {
+                nav.classList.toggle('show');
+                home.classList.toggle('show1');
+                patient.classList.toggle('show2');
+                Alert.classList.toggle('show3');
+                reports.classList.toggle('show4');
+                setting.classList.toggle('show5');
+
+                if (nav.classList.contains('show')) {
+                    nav.style.display = 'flex';
+                    void nav.offsetWidth; /* Trigger reflow to restart animation */
+                } else {
+                    nav.addEventListener('transitionend', () => {
+                        nav.style.display = 'none';
+                    }, { once: true });
+                }
+            }
+        }
+
+        // Handle resize event to adjust menu display
+        function handleResize() {
+            const nav = document.getElementById('navMenu');
+            const home = document.getElementById('home-a');
+            const patient = document.getElementById('patient-a');
+            const Alert = document.getElementById('alert-a');
+            const reports = document.getElementById('reports-a');
+            const setting = document.getElementById('setting-a');
+
+            if (window.innerWidth > 986) {
+                nav.classList.remove('show');
+                nav.style.display = 'flex';
+                home.classList.remove('show1');
+                home.style.display = 'flex';
+                patient.classList.remove('show2');
+                patient.style.display = 'flex';
+                Alert.classList.remove('show3');
+                Alert.style.display = 'flex';
+                reports.classList.remove('show4');
+                reports.style.display = 'flex';
+                setting.classList.remove('show5');
+                setting.style.display = 'flex';
+            } else {
+                nav.style.display = nav.classList.contains('show') ? 'flex' : 'none';
+                home.style.display = home.classList.contains('show1') ? 'flex' : 'none';
+                patient.style.display = patient.classList.contains('show2') ? 'flex' : 'none';
+                Alert.style.display = Alert.classList.contains('show3') ? 'flex' : 'none';
+                reports.style.display = reports.classList.contains('show4') ? 'flex' : 'none';
+                setting.style.display = setting.classList.contains('show5') ? 'flex' : 'none';
+            }
+        }
+
+        window.addEventListener('resize', handleResize);
+        window.addEventListener('DOMContentLoaded', handleResize);
+
+        // Function to update the greeting based on time of day
+        function updateGreeting() {
+            const now = new Date();
+            const hour = now.getHours();
+            let greetingText;
+
+            if (hour >= 5 && hour < 12) {
+                greetingText = "Good Morning";
+            } else if (hour >= 12 && hour < 17) {
+                greetingText = "Good Afternoon";
+            } else if (hour >= 17 && hour < 20) {
+                greetingText = "Good Evening";
+            } else {
+                greetingText = "Good Night";
+            }
+            // Update the greeting text, assuming it's dynamic from Django context
+            document.getElementById('greeting').textContent = greetingText + ", {{ request.user.first_name }}!";
+        }
+
+        // Call updateGreeting on page load
+        document.addEventListener('DOMContentLoaded', updateGreeting);
+    </script>
+</body>
+</html>

@@ -1,0 +1,254 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Register User - MediDash Admin</title>
+    <link rel="stylesheet" href="{% static 'styles/register-user.css' %}">
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+</head>
+<body>
+    <div class="header">
+       <header class="header-container">
+        <div class="logoside">
+            <img src="{% static 'innerimg/logo.png' %}" alt="logo" loading="lazy">
+        </div>
+        <div class="main-nav" id="navMenu">
+            <a href="{% url 'admin_dashboard' %}" id="home-a" >Home</a>
+            <a href="{% url 'admin_register_user' %}" id="patient-a" class="active">Register Users</a>
+            <a href="{% url 'admin_view_records' %}" id="alert-a">View Records</a>
+            <a href="{% url 'admin_register_device' %}" id="device-a">Register Device</a>
+            <a href="{% url 'admin_settings' %}" id="setting-a">Settings</a>
+        </div>
+        <div class="rightside">
+            <a href="{% url 'admin_notifications' %}" class="notification">Notifications 🔔</a>
+            <a href="{% url 'logout' %}" id="logout-a">Logout</a>
+            <a href="{% url 'admin_notifications' %}" class="m-notification">🔔 </a>
+            <span class="badge">{{ unread_notifications_count }}</span>
+            <button type="button" class="menu-button" onclick="toggleMenu()">
+                <img src="https://placehold.co/40x40/f0f4f7/556080?text=AD" alt="Profile Picture" class="profile-pic">
+            </button>
+            <span class="doctor-name">{{ request.user.first_name }} {{ request.user.last_name }}</span>
+        </div>
+       </header>
+    </div>
+
+    <div id="custom-message-overlay" style="display:none;">
+        <div class="message-box">
+            <span class="close-btn">&times;</span>
+            <h3 id="message-title"></h3>
+            <div id="message-content"></div>
+        </div>
+    </div>
+    <div class="main-container">   
+      <main class="form-container">
+        {% if messages %}
+                <ul class="messages" style="display:none;">
+                    {% for message in messages %}
+                        <li{% if message.tags %} class="{{ message.tags }}" data-title="{{ message.tags|capfirst }}" data-message="{{ message }}"{% endif %}>{{ message }}</li>
+                    {% endfor %}
+                </ul>
+            {% endif %}
+        <div class="form-toggle">
+            <button class="active" onclick="showForm('doctor')">Register Doctor</button>
+            <button onclick="showForm('patient')">Register Patient</button>
+        </div>
+
+        <div class="form-wrapper">
+
+            <div id="doctor-form" class="form-section active">
+                <h2>Doctor Registration</h2>
+                <form action="{% url 'admin_register_user' %}" method="POST" class="register-form" enctype="multipart/form-data">
+                    {% csrf_token %} <input type="hidden" name="register_doctor" value="true">
+                    
+                    {% for field in doctor_form %}
+                        <div class="form-group">
+                            {{ field.label_tag }}
+                            {{ field }}
+                            {% if field.help_text %}
+                                <small class="help-text">{{ field.help_text }}</small>
+                            {% endif %}
+                            {% for error in field.errors %}
+                                <p class="error-message">{{ error }}</p>
+                            {% endfor %}
+                        </div>
+                    {% endfor %}
+                    
+                    {% if doctor_form.non_field_errors %}
+                        <ul class="form-errors">
+                            {% for error in doctor_form.non_field_errors %}
+                                <li>{{ error }}</li>
+                            {% endfor %}
+                        </ul>
+                    {% endif %}
+
+                    <button type="submit" class="submit-btn" id="submitBtn">Register Doctor</button>
+                </form>
+            </div>
+
+            <div id="patient-form" class="form-section">
+                <h2>Patient Registration</h2>
+                <form action="{% url 'admin_register_user' %}" method="POST" class="register-form" enctype="multipart/form-data">
+                    {% csrf_token %}
+                    <input type="hidden" name="register_patient" value="true">
+
+                    {% for field in patient_form %}
+                        <div class="form-group">
+                            {{ field.label_tag }}
+                            {{ field }}
+                            {% if field.help_text %}
+                                <small class="help-text">{{ field.help_text }}</small>
+                            {% endif %}
+                            {% for error in field.errors %}
+                                <p class="error-message">{{ error }}</p>
+                            {% endfor %}
+                        </div>
+                    {% endfor %}
+
+                    {% if patient_form.non_field_errors %}
+                        <ul class="form-errors">
+                            {% for error in patient_form.non_field_errors %}
+                                <li>{{ error }}</li>
+                            {% endfor %}
+                        </ul>
+                    {% endif %}
+
+                    <button type="submit" class="submit-btn" id="submitBtn">Register Patient</button>
+                </form>
+            </div>
+        </div>
+      </main>
+    </div>
+
+    <script>
+        // JavaScript for mobile menu toggle (same as admin-panel.html)
+        function toggleMenu() {
+            const nav = document.getElementById('navMenu');
+            const home = document.getElementById('home-a');
+            const patient = document.getElementById('patient-a');
+            const device = document.getElementById('device-a');
+            const Alert = document.getElementById('alert-a');
+            const setting = document.getElementById('setting-a');
+
+            if (window.innerWidth <= 986) {
+                nav.classList.toggle('show');
+                home.classList.toggle('show1');
+                patient.classList.toggle('show2');
+                Alert.classList.toggle('show3');
+                device.classList.toggle('showDevice');
+                setting.classList.toggle('show5');
+
+                if (nav.classList.contains('show')) {
+                    nav.style.display = 'flex';
+                    void nav.offsetWidth;
+                } else {
+                    nav.addEventListener('transitionend', () => {
+                        nav.style.display = 'none';
+                    }, { once: true });
+                }
+            }
+        }
+
+        function handleResize() {
+            const nav = document.getElementById('navMenu');
+            const home = document.getElementById('home-a');
+            const patient = document.getElementById('patient-a');
+            const device = document.getElementById('device-a');
+            const Alert = document.getElementById('alert-a');
+            const setting = document.getElementById('setting-a');
+
+            if (window.innerWidth > 986) {
+                nav.classList.remove('show');
+                nav.style.display = 'flex';
+                home.classList.remove('show1');
+                home.style.display = 'flex';
+                patient.classList.remove('show2');
+                patient.style.display = 'flex';
+                Alert.classList.remove('show3');
+                Alert.style.display = 'flex';
+                device.classList.remove('showDevice');
+                device.style.display = 'flex';
+                setting.classList.remove('show5');
+                setting.style.display = 'flex';
+            } else {
+                nav.style.display = nav.classList.contains('show') ? 'flex' : 'none';
+                home.style.display = home.classList.contains('show1') ? 'flex' : 'none';
+                patient.style.display = patient.classList.contains('show2') ? 'flex' : 'none';
+                Alert.style.display = Alert.classList.contains('show3') ? 'flex' : 'none';
+                device.style.display = device.classList.contains('showDevice') ? 'flex' : 'none';
+                setting.style.display = setting.classList.contains('show5') ? 'flex' : 'none';
+            }
+        }
+
+        window.addEventListener('resize', handleResize);
+        window.addEventListener('DOMContentLoaded', handleResize);
+
+        // Function to toggle between doctor and patient registration forms
+        function showForm(type) {
+            const doctorBtn = document.querySelectorAll('.form-toggle button')[0];
+            const patientBtn = document.querySelectorAll('.form-toggle button')[1];
+            const doctorForm = document.getElementById('doctor-form');
+            const patientForm = document.getElementById('patient-form');
+
+            if (type === 'doctor') {
+                doctorBtn.classList.add('active');
+                patientBtn.classList.remove('active');
+                doctorForm.classList.add('active');
+                patientForm.classList.remove('active');
+            } else {
+                patientBtn.classList.add('active');
+                doctorBtn.classList.remove('active');
+                patientForm.classList.add('active');
+                doctorForm.classList.remove('active');
+            }
+        }
+
+        // Pop-up message logic
+        document.addEventListener('DOMContentLoaded', function() {
+            var messageOverlay = document.getElementById('custom-message-overlay');
+            var messageTitle = document.getElementById('message-title');
+            var messageContent = document.getElementById('message-content');
+            var closeBtn = document.querySelector('.close-btn');
+            var messageLi = document.querySelector('.messages li');
+            if (messageLi) {
+                messageTitle.textContent = messageLi.getAttribute('data-title') || 'Message';
+                messageContent.textContent = messageLi.getAttribute('data-message') || messageLi.textContent;
+                messageOverlay.style.display = 'block';
+                setTimeout(function() {
+                    messageOverlay.style.display = 'none';
+                }, 3500);
+            }
+            if (closeBtn) {
+                closeBtn.onclick = function() {
+                    messageOverlay.style.display = 'none';
+                };
+            }
+        });
+
+        $(document).ready(function() {
+            $('#id_doctor').select2({
+                placeholder: "Select a doctor",
+                allowClear: true
+            });
+        });
+    </script>
+    <style>
+        /* Basic styling for the password display box */
+        .password-display-box {
+            background-color: #e9f7ef; /* Light green for success */
+            border: 1px solid #d4edda;
+            color: #155724;
+            padding: 15px;
+            margin-bottom: 20px;
+            border-radius: 5px;
+            text-align: center;
+        }
+        .password-display-box strong {
+            color: #004d00; /* Darker green for emphasis */
+            font-size: 1.1em;
+        }
+    </style>
+</body>
+</html>

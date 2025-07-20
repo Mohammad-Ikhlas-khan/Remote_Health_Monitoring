@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Access Denied</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f8f9fa;
+            color: #343a40;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            text-align: center;
+        }
+        .container {
+            background-color: #ffffff;
+            padding: 40px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            max-width: 500px;
+            width: 90%;
+        }
+        h1 {
+            color: #dc3545; /* Red for error */
+            margin-bottom: 20px;
+        }
+        p {
+            font-size: 1.1em;
+            margin-bottom: 30px;
+        }
+        a {
+            background-color: #007bff;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 5px;
+            text-decoration: none;
+            transition: background-color 0.3s ease;
+        }
+        a:hover {
+            background-color: #0056b3;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Access Denied!</h1>
+        <p>{{ message }}</p>
+        <p>Please return to your dashboard or login.</p>
+        <a href="{% url 'login' %}">Go to Login Page</a>
+        {% if request.user.is_authenticated %}
+            {% if request.user.role == 'admin' %}
+                <p><a href="{% url 'admin_dashboard' %}">Go to Admin Dashboard</a></p>
+            {% elif request.user.role == 'doctor' %}
+                <p><a href="{% url 'doctor_dashboard' %}">Go to Doctor Dashboard</a></p>
+            {% elif request.user.role == 'patient' %}
+                <p><a href="{% url 'patient_dashboard' %}">Go to Patient Dashboard</a></p>
+            {% endif %}
+        {% endif %}
+    </div>
+</body>
+</html>

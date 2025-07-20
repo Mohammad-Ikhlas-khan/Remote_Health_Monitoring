@@ -1,0 +1,1133 @@
+*{
+    padding: 0;
+    margin: 0;
+    box-sizing: border-box;
+}
+
+:root {
+  /* Base Colors */
+  --background-color: #f4f6f9;
+  --primary-color: #2980b9;
+  --secondary-color: #7f8c8d;
+  --button-color:#3498db;
+  --header-footer-color: #2c3e50;
+  --panel-bg-color: #34495e;
+  --alert-color: #e74c3c;
+  --box-background-color:white;
+  --normal-color:green;
+  /* Text Colors */
+  --text-primary: #2c3e50;
+  --text-secondary: #7f8c8d;
+  --text-on-dark: #ffffff;
+}
+
+.Critical{
+  color: var(--alert-color);
+  font-weight: bold;
+}
+.normal{
+  color: var(--normal-color);
+  font-weight: bold;
+}
+
+
+html body {
+    font-family: 'Roboto', sans-serif;
+    background: var(--background-color); /* Subtle gray background */
+}
+
+.header{
+      background-color: var(--header-footer-color);
+}
+.header-container{
+    display: flex;
+    flex-direction: row;
+    max-width: 1100px;
+    justify-content: space-between;
+    align-items: center;
+    margin: 0 auto;
+    /* padding: 2rem; */
+    color: white;
+    gap: 2rem;
+}
+
+.logoside{
+ width: 9%;
+  height:5.9rem;
+   animation: slideDown 0.9s ease-in-out;
+  animation-iteration-count: 1;
+  animation-fill-mode: forwards; 
+}
+.logoside img{
+    width: 100%;
+    height: 100%;
+    
+}
+
+.main-nav {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between; 
+    align-items: center;
+    gap: 0.56rem;
+    animation: slideDown 1.2s ease-in-out;
+  animation-iteration-count: 1;
+  animation-fill-mode: forwards;
+}
+
+.main-nav a{
+    color: var(--text-on-dark);
+    text-decoration: none;
+    font-size: 1.1rem;
+    font-weight: 600;
+    padding: 0.7rem;
+    transition: all 0.2s ease-in 0s;
+}
+
+.main-nav a:hover{
+    background-color: var(--button-color);
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+    border-radius: 0.3rem;
+    color: var(--text-on-dark);
+}
+.main-nav .active{
+     background-color: var(--button-color);
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+    border-radius: 0.3rem;
+    color: var(--text-on-dark);
+}
+
+.rightside{
+    display: flex;
+    flex-direction: row;
+    flex-direction: center;
+    align-items: center;
+    gap: 0.98rem;
+    animation: slideDown 1.4s ease-in-out;
+  animation-iteration-count: 1;
+  animation-fill-mode: forwards;
+    /* text-decoration: none; */
+}
+.profile-name{
+    text-decoration: none;
+    color: var(--text-on-dark);
+    font-size: 1.1rem;
+    font-weight: 600;
+}
+.notification{
+    color: var(--text-on-dark);
+    font-size: 1.1rem;
+    font-weight: 600;
+    text-decoration: none;
+    transition: all 0.3s ease-in;
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    gap: 0.23rem;
+}
+.m-notification , .badge{
+   display: none;
+}
+.notification img{
+    width: 1.3rem;
+    height: 1.3rem;
+}
+.notification:hover{
+   animation: bounce 3s ease-in;
+  animation-iteration-count: 1;
+    color: var(--primary-color);
+}
+.profile{
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    gap: 0.2rem;
+    text-decoration: none;
+}
+.profile-img{
+    width: 2.7rem;
+    height: 2.7rem;
+    border-radius: 9999px;
+    object-fit: cover;
+}
+
+.menu-button{
+    border: none;
+    background: none;
+    display: none;
+}
+
+.menu-icon{
+    height:3.5rem;
+    width:3.5rem;
+}
+
+
+/*  Main container  */
+.main-content{
+  margin: 0 auto;
+  padding: 1.2rem;
+  max-width: 1100px;
+  background-color: var(--background-color);
+}
+
+
+/* Section Styling (General) */
+section {
+    background-color: #ffffff;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0px 2px 8px  rgba(0, 0, 0, 0.1);
+    margin-bottom: 25px;
+}
+
+section h2 {
+    color: #2c3e50;
+    /* margin-top: 0; */
+    margin-bottom: 20px;
+    border-bottom: 1px solid #eee;
+    padding-bottom: 10px;
+}
+
+/* Patient Vitals Section */
+.patient-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 20px;
+}
+
+.patient-card {
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    padding: 20px;
+    background-color: #fdfdfd;
+    box-shadow: 0px 2px 8px  rgba(0, 0, 0, 0.1);
+    transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+}
+
+.patient-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+}
+
+.patient-card.abnormal {
+    border-left: 5px solid #e74c3c; /* Red border for abnormal */
+    background-color: #fbe5e3;
+}
+
+.patient-card h3 {
+    margin-top: 0;
+    margin-bottom: 10px;
+    color: #34495e;
+}
+
+.patient-card .vitals p {
+    margin: 5px 0;
+    display: flex;
+    align-items: center;
+}
+
+.patient-card .vitals strong {
+    min-width: 60px; /* Align vital names */
+    display: inline-block;
+}
+
+.status {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    display: inline-block;
+    margin-left: 8px;
+    vertical-align: middle;
+}
+
+.status.normal {
+    background-color: #27ae60; /* Green */
+}
+
+.status.abnormal {
+    background-color: #e74c3c; /* Red */
+}
+
+.view-details-btn {
+    background-color: #3498db;
+    color: white;
+    border: none;
+    padding: 8px 12px;
+    border-radius: 5px;
+    cursor: pointer;
+    margin-top: 15px;
+    transition: background-color 0.3s ease;
+}
+
+.view-details-btn:hover {
+    background-color: #2980b9;
+}
+
+/* Alerts Section */
+.alert-list .alert-item {
+    display: flex;
+    align-items: center;
+    background-color: #ffecec; /* Light red background */
+    border: 1px solid #e74c3c;
+    border-radius: 5px;
+    padding: 10px 15px;
+    margin-bottom: 10px;
+}
+
+.alert-list .alert-item.warning {
+    background-color: #fff3cd; /* Light yellow background */
+    border-color: #f39c12;
+}
+
+.alert-list .alert-item.critical {
+    background-color: #fbe5e3; /* Light red background */
+    border-color: #c0392b;
+}
+
+
+.alert-list .alert-item i {
+    margin-right: 10px;
+    font-size: 1.2em;
+    color: #e74c3c; /* Red icon */
+}
+
+.alert-list .alert-item.warning i {
+    color: #f39c12; /* Orange icon */
+}
+
+.alert-list .alert-item.critical i {
+    color: #c0392b; /* Darker red icon */
+}
+
+.alert-list .alert-item p {
+    flex-grow: 1;
+    margin: 0;
+}
+
+.alert-list .alert-item button {
+    background-color: #95a5a6; /* Grey */
+    color: white;
+    border: none;
+    padding: 6px 10px;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.alert-list .alert-item button:hover {
+    background-color: #7f8c8d;
+}
+
+/* Device Battery Section */
+.device-list .device-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 0;
+    border-bottom: 1px solid #eee;
+}
+
+.device-list .device-item:last-child {
+    border-bottom: none;
+}
+
+.device-list .device-item p {
+    margin: 0;
+    flex-grow: 1;
+}
+
+.battery-bar {
+    width: 100px;
+    height: 12px;
+    background-color: #e0e0e0;
+    border-radius: 6px;
+    overflow: hidden;
+    margin-right: 10px;
+}
+
+.battery-bar div {
+    height: 100%;
+    background-color: #27ae60; /* Green for battery */
+    border-radius: 6px;
+    transition: width 0.3s ease;
+}
+
+.device-item.low-battery .battery-bar div {
+    background-color: #e74c3c; /* Red for low battery */
+}
+
+.device-item.low-battery i {
+    color: #e74c3c;
+    margin-left: 5px;
+}
+
+/* Appointments Section */
+.appointment-list .appointment-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 0;
+    border-bottom: 1px solid #eee;
+}
+
+.appointment-list .appointment-item:last-child {
+    border-bottom: none;
+}
+
+.appointment-list .appointment-item p {
+    margin: 0;
+    font-weight: bold;
+    flex-grow: 1;
+}
+
+.appointment-list .appointment-item button {
+    background-color: #95a5a6;
+    color: white;
+    border: none;
+    padding: 6px 10px;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.appointment-list .appointment-item button:hover {
+    background-color: #7f8c8d;
+}
+
+/* Chat Section */
+.chat-preview .chat-message {
+    background-color: #f8f8f8;
+    border: 1px solid #eee;
+    border-radius: 5px;
+    padding: 10px 15px;
+    margin-bottom: 10px;
+}
+
+.chat-preview .chat-message p {
+    margin: 0;
+}
+
+.new-chat-btn {
+    background-color: #2ecc71; /* Green */
+    color: white;
+    border: none;
+    padding: 10px 15px;
+    border-radius: 5px;
+    cursor: pointer;
+    display: block;
+    width: fit-content;
+    margin-top: 15px;
+    transition: background-color 0.3s ease;
+}
+
+.new-chat-btn:hover {
+    background-color: #27ae60;
+}
+
+
+
+@media screen and (max-width:900px) {
+  .header{
+    position: relative;
+    
+  }
+   .header-container{
+        /* padding-inline: 0.8rem; */
+        padding-bottom: -5.3rem;
+        gap: 1.2rem;
+        justify-content: space-between;
+      }
+      .main-nav{
+        display: none;
+      }
+
+      .notification, .profile{
+        display: none;
+      }
+
+      .m-notification{
+        /* display: block; */
+        /* width: 8rem;
+        height: 8rem; */
+        font-size: 1.4rem;
+        position: relative;
+        display: inline-block;
+      }
+       .badge{
+        position: absolute;
+        top: 12px;
+        right: 60px;
+        padding: 0.1px 4px;
+        border-radius: 50%;
+        background: red;
+        color: white;
+        display: block;
+      }
+
+        .menu-button{
+        display: block;
+        width: 4rem;
+        height: 3.5rem;
+    }
+    .menu-icon{
+      width: 100%;
+      height: 100%;
+    }
+
+    .logoside{
+      width: 20%;
+      height: 4.5rem;
+      
+    }
+
+    .rightside{
+      gap: 0;
+    }
+    
+    .main-nav{
+        position: absolute;
+        top: 0;
+        /* left: 50%; */
+        background-color: var(--panel-bg-color);
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        /* border-radius: 8px; */
+        padding: 1rem;
+        flex-direction: column;
+        min-width: 150px;
+        width: 100%;
+        display: none;
+        opacity: 0;
+        /* animation: slideup 0.8s ease-out; */
+    }
+
+    .main-nav.show{
+        display: flex;
+        opacity: 1;
+       animation: slidedown 0.4s ease--in-out;
+
+    }
+    #home-a.show1{
+       animation: slidedown 0.4s ease-in-out;
+    }
+    #patient-a.show2{
+       animation: slidedown 0.6s ease-in-out;
+    }
+    #alert-a.show3{
+       animation: slidedown 0.8s ease-in-out;
+    }
+    #reports-a.show4{
+       animation: slidedown 1s ease-out;
+    }
+    #setting-a.show5{
+       animation: slidedown 1.2s ease-in-out;
+    }
+    .main-header{
+      margin-top: 5rem;
+    }
+  #logout-a{
+        display: none;
+    }
+    
+}
+
+@media screen and (min-width:500px){
+      
+     .logoside{
+      /* width: 0%; */
+      height: 6rem;
+    }
+    .badge{
+        position: absolute;
+        top: 25px;
+        right: 60px;
+        padding: 0.1px 4px;
+        border-radius: 50%;
+        background: red;
+        color: white;
+    
+      }
+      .main-nav{
+              top: 100%;
+
+          }
+
+    
+    
+    }
+
+/* @keyframes bounce {
+  0%, 20%, 50%, 80%, 100% {
+    transform: translateY(0);
+  }
+  40% {
+    transform: translateY(-25px);
+  }
+  60% {
+    transform: translateY(-15px);
+  }
+} */
+
+/* @keyframes slideDown {
+  0% {
+    transform: translateY(-100px);
+    opacity: 0;
+  }
+  100% {
+    transform: translateY(0);
+    opacity: 1;
+  }
+} */
+
+@keyframes slideDown1 {
+  0% {
+    transform: translateY(-100px);
+    opacity: 0;
+  }
+  100% {
+    transform: translateY(0);
+    opacity: 1;
+  }
+} 
+
+@keyframes slidedown {
+
+    0%{
+        opacity: 0;
+        transform: translateY(-20px) ;
+    }
+
+    100%{
+        opacity: 1;
+        transform: translateY(0);
+    }
+    
+}
+
+
+
+
+/* Alerts Page Specific Styles */
+#alerts h2 {
+    margin-bottom: 15px;
+}
+
+.alerts-controls {
+    display: flex;
+    flex-wrap: wrap; /* Allow controls to wrap on smaller screens */
+    justify-content: flex-start;
+    align-items: center;
+    gap: 20px; /* Space between filter/sort groups */
+    margin-bottom: 25px;
+    padding-bottom: 15px;
+    border-bottom: 1px solid #eee;
+}
+
+.alerts-controls label {
+    font-weight: bold;
+    margin-right: 5px;
+    color: #555;
+    font-size: 0.95em;
+}
+
+.alerts-controls select,
+.alerts-controls button {
+    padding: 8px 12px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    background-color: #f8f8f8;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    font-size: 0.95em;
+    outline: none;
+}
+
+.alerts-controls select:focus,
+.alerts-controls button:hover {
+    border-color: #3498db;
+    box-shadow: 0 0 0 2px rgba(52, 152, 219, 0.2);
+}
+
+.action-button {
+    background-color: #3498db; /* Blue */
+    color: white;
+    border: none;
+    padding: 8px 15px;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    font-size: 0.95em;
+}
+
+.action-button:hover {
+    background-color: #2980b9;
+}
+
+.action-button.warn {
+    background-color: #e67e22; /* Orange */
+}
+
+.action-button.warn:hover {
+    background-color: #d35400;
+}
+
+/* Alerts Container - Layout */
+.alerts-container {
+    display: flex;
+    gap: 20px;
+    flex-wrap: wrap; /* Allow container to wrap on smaller screens */
+}
+
+.alert-list-panel {
+    flex: 2; /* Takes 2 parts of space */
+    background-color: #fdfdfd;
+    border-radius: 8px;
+    padding: 15px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    min-width: 350px; /* Ensure it doesn't get too small initially */
+    flex-basis: 0; /* Allows flex-grow to work properly */
+    min-height: 400px; /* Ensure minimum height */
+    display: flex;
+    flex-direction: column;
+}
+
+.alert-detail-panel {
+    flex: 1; /* Takes 1 part of space */
+    background-color: #fdfdfd;
+    border-radius: 8px;
+    padding: 15px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    min-width: 280px; /* Minimum width for detail panel */
+    flex-basis: 0;
+    min-height: 400px; /* Ensure minimum height */
+    display: flex;
+    flex-direction: column;
+}
+
+.alert-list-panel h3,
+.alert-detail-panel h3 {
+    margin-top: 0;
+    margin-bottom: 15px;
+    color: #34495e;
+    border-bottom: 1px solid #eee;
+    padding-bottom: 10px;
+    font-size: 1.2em;
+}
+
+/* Alert Item Specifics */
+.alert-list {
+    flex-grow: 1; /* Allows list to fill remaining space in panel */
+    max-height: 100%; /* Important for overflow to work */
+    overflow-y: auto; /* Scrollable list */
+    padding-right: 10px; /* Space for scrollbar */
+}
+
+.alert-item {
+    display: flex;
+    align-items: center;
+    background-color: #fff; /* White background for individual items */
+    border: 1px solid #e0e0e0;
+    border-left-width: 5px; /* For severity indicator */
+    border-left-style: solid;
+    border-radius: 5px;
+    padding: 12px 15px; /* More padding */
+    margin-bottom: 10px;
+    cursor: pointer; /* Indicate it's clickable */
+    transition: background-color 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.alert-item:hover {
+    background-color: #f8f8f8;
+}
+
+.alert-item.selected {
+    background-color: #eaf6fd; /* Light blue for selected */
+    border-color: #3498db;
+    box-shadow: 0 0 8px rgba(52, 152, 219, 0.3); /* Clearer shadow */
+}
+
+.alert-item.critical {
+    border-left-color: #e74c3c; /* Red */
+}
+.alert-item.critical i {
+    color: #e74c3c;
+}
+
+.alert-item.warning {
+    border-left-color: #f39c12; /* Orange */
+}
+.alert-item.warning i {
+    color: #f39c12;
+}
+
+.alert-item.info {
+    border-left-color: #3498db; /* Blue */
+}
+.alert-item.info i {
+    color: #3498db;
+}
+
+.alert-item.acknowledged {
+    background-color: #f0f8f0; /* Light green for acknowledged */
+    border-left-color: #2ecc71; /* Green */
+    opacity: 1; /* Slightly less opaque */
+}
+.alert-item.acknowledged .alert-info p {
+    text-decoration: line-through;
+    color: #7f8c8d;
+    font-style: italic; /* Added italic for acknowledged */
+}
+
+.alert-item i {
+    margin-right: 12px; /* More space */
+    font-size: 1.5em; /* Larger icon */
+    min-width: 30px; /* Ensure icon doesn't shrink */
+    text-align: center;
+}
+
+.alert-item .alert-info {
+    flex-grow: 1;
+}
+
+.alert-item .alert-info p {
+    margin: 0;
+    font-weight: bold;
+    line-height: 1.4;
+    font-size: 1em;
+}
+
+.alert-item .alert-info small {
+    display: block;
+    color: #7f8c8d;
+    font-size: 0.8em; /* Slightly smaller for meta info */
+    margin-top: 3px;
+}
+
+.alert-item .alert-actions {
+    display: flex;
+    gap: 8px; /* More space between buttons */
+    margin-left: 15px;
+    flex-shrink: 0; /* Prevent actions from shrinking */
+}
+
+.alert-item .alert-actions button {
+    background-color: #95a5a6;
+    color: white;
+    border: none;
+    padding: 7px 11px; /* Slightly more padding */
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    font-size: 0.85em; /* Slightly smaller text */
+}
+
+.alert-item .alert-actions button:hover {
+    background-color: #7f8c8d;
+}
+
+.alert-item .alert-actions .acknowledge-btn {
+    background-color: #2ecc71; /* Green for Acknowledge */
+}
+.alert-item .alert-actions .acknowledge-btn:hover {
+    background-color: #27ae60;
+}
+.alert-item .alert-actions .acknowledge-btn:disabled {
+    background-color: #a8dadc; /* Lighter green for disabled */
+    cursor: not-allowed;
+    opacity: 0.7;
+}
+
+
+.alert-item .alert-actions .dismiss-btn {
+    background-color: #e74c3c; /* Red for Dismiss */
+    padding: 7px 9px; /* For just icon */
+}
+.alert-item .alert-actions .dismiss-btn:hover {
+    background-color: #c0392b;
+}
+
+/* Alert Detail Panel */
+.alert-details-view {
+    flex-grow: 1; /* Allow details to fill remaining space */
+    display: flex; /* For centering initial message */
+    flex-direction: column;
+    justify-content: center; /* Center vertically */
+    align-items: center; /* Center horizontally */
+    text-align: center;
+    color: #777;
+    padding: 20px;
+}
+.alert-details-view .initial-message {
+    margin: 0; /* Reset default paragraph margin */
+}
+
+.alert-detail-content {
+    /* display: none; /* Hide if no alert is selected by default */
+    width: 100%; /* Fill parent */
+    text-align: left; /* Ensure text alignment */
+    padding: 10px; /* Add some padding if needed, although panel has padding */
+}
+
+.alert-detail-content h4 {
+    margin-top: 0;
+    margin-bottom: 18px;
+    font-size: 1.4em;
+    color: #34495e;
+    text-align: center; /* Center heading */
+}
+
+.alert-detail-content p {
+    margin-bottom: 10px; /* Space between detail lines */
+    color: #555;
+    font-size: 0.95em;
+    display: flex; /* Use flex to align label and value */
+}
+.alert-detail-content p strong {
+    min-width: 100px; /* Align labels consistently */
+    display: inline-block;
+    color: #333;
+    font-weight: 600;
+    margin-right: 10px;
+}
+
+.detail-actions {
+    margin-top: 30px; /* More space */
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+    flex-wrap: wrap; /* Allow buttons to wrap */
+}
+
+.detail-actions .action-button {
+    padding: 10px 20px;
+    font-size: 1em;
+}
+
+.detail-actions .action-button.primary {
+    background-color: #2ecc71;
+}
+.detail-actions .action-button.primary:hover {
+    background-color: #27ae60;
+}
+
+.detail-actions .action-button.secondary {
+    background-color: #95a5a6;
+}
+.detail-actions .action-button.secondary:hover {
+    background-color: #7f8c8d;
+}
+
+.detail-actions .action-button.assign {
+    background-color: #f39c12; /* Orange for assign */
+}
+.detail-actions .action-button.assign:hover {
+    background-color: #e67e22;
+}
+
+/* --- Modern Doctor Alerts Styles --- */
+body {
+    background: #f4f7fa;
+    font-family: 'Segoe UI', Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+}
+
+.main-container {
+    max-width: 1100px;
+    margin: 48px auto 0 auto;
+    background: #fff;
+    border-radius: 18px;
+    box-shadow: 0 8px 32px rgba(34,48,70,0.13);
+    padding: 48px 60px 40px 60px;
+}
+
+.main-container h1 {
+    font-size: 2.3rem;
+    font-weight: 800;
+    color: #223046;
+    margin-bottom: 28px;
+    text-align: left;
+}
+
+.alerts-overview {
+    display: flex;
+    gap: 32px;
+    margin-bottom: 36px;
+    flex-wrap: wrap;
+}
+.overview-card {
+    background: #f7fafc;
+    border-radius: 14px;
+    box-shadow: 0 2px 12px rgba(52,152,219,0.10);
+    padding: 28px 36px;
+    min-width: 180px;
+    flex: 1 1 180px;
+    text-align: center;
+    margin-bottom: 12px;
+    font-size: 1.15rem;
+    font-weight: 600;
+    color: #223046;
+}
+
+.alert-filters {
+    display: flex;
+    gap: 14px;
+    margin-bottom: 18px;
+    align-items: center;
+}
+.alert-filters input, .alert-filters select {
+    padding: 10px;
+    border: 1px solid #cfd8dc;
+    border-radius: 7px;
+    font-size: 1.05rem;
+    background: #fff;
+}
+.action-button {
+    min-width: 120px;
+    padding: 10px 0;
+    font-size: 1.08rem;
+    font-weight: 700;
+    background: linear-gradient(90deg, #3498db 0%, #6dd5fa 100%);
+    color: #fff;
+    border: none;
+    border-radius: 6px;
+    box-shadow: 0 2px 8px rgba(52,152,219,0.10);
+    cursor: pointer;
+    transition: background 0.2s, box-shadow 0.2s;
+    margin-bottom: 0;
+    margin-right: 12px;
+}
+.action-button:hover, .action-button.active {
+    background: linear-gradient(90deg, #217dbb 0%, #3498db 100%);
+    box-shadow: 0 4px 16px rgba(52,152,219,0.18);
+}
+
+.alert-content {
+    display: flex;
+    gap: 32px;
+    margin-top: 24px;
+}
+.alert-list-container {
+    flex: 2;
+}
+.alert-list {
+    margin-top: 0;
+}
+.alert-item {
+    background: #f7fafc;
+    border-radius: 12px;
+    box-shadow: 0 2px 12px rgba(52,152,219,0.10);
+    padding: 18px 22px;
+    margin-bottom: 18px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    transition: box-shadow 0.2s;
+}
+.alert-item.selected {
+    border-left: 6px solid #3498db;
+    background: #eaf4fb;
+}
+.alert-summary {
+    display: flex;
+    align-items: center;
+    gap: 18px;
+    font-size: 1.08rem;
+}
+.alert-summary .icon {
+    color: #e74c3c;
+    font-size: 1.3rem;
+}
+.alert-actions {
+    display: flex;
+    gap: 10px;
+    margin-top: 8px;
+}
+.acknowledge-btn, .dismiss-btn {
+    min-width: 100px;
+    padding: 8px 0;
+    font-size: 1.02rem;
+    font-weight: 600;
+    background: linear-gradient(90deg, #3498db 0%, #6dd5fa 100%);
+    color: #fff;
+    border: none;
+    border-radius: 6px;
+    box-shadow: 0 2px 8px rgba(52,152,219,0.10);
+    cursor: pointer;
+    transition: background 0.2s, box-shadow 0.2s;
+}
+.acknowledge-btn:hover, .dismiss-btn:hover {
+    background: linear-gradient(90deg, #217dbb 0%, #3498db 100%);
+    box-shadow: 0 4px 16px rgba(52,152,219,0.18);
+}
+
+.alert-detail-panel {
+    flex: 1;
+    background: #f7fafc;
+    border-radius: 14px;
+    box-shadow: 0 2px 12px rgba(52,152,219,0.10);
+    padding: 28px 24px;
+    min-width: 320px;
+    margin-left: 12px;
+}
+.alert-detail-panel h2 {
+    font-size: 1.3rem;
+    font-weight: 700;
+    color: #223046;
+    margin-bottom: 18px;
+}
+#detail-content {
+    margin-bottom: 18px;
+    color: #223046;
+    font-size: 1.08rem;
+}
+.detail-actions {
+    display: flex;
+    gap: 16px;
+    justify-content: center;
+    margin-top: 24px;
+}
+.detail-actions .action-button {
+    min-width: 120px;
+    padding: 10px 0;
+    font-size: 1.08rem;
+    font-weight: 700;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: background 0.2s, box-shadow 0.2s;
+}
+.detail-actions .action-button:hover {
+    background: linear-gradient(90deg, #217dbb 0%, #3498db 100%);
+    box-shadow: 0 4px 16px rgba(52,152,219,0.18);
+}
+@media (max-width: 900px) {
+    .main-container {
+        padding: 24px 8px;
+    }
+    .alerts-overview, .alert-content {
+        flex-direction: column;
+        gap: 16px;
+    }
+    .alert-detail-panel {
+        margin-left: 0;
+        min-width: unset;
+    }
+}
+@media (max-width: 600px) {
+    .main-container {
+        padding: 8px 2px;
+    }
+    .main-container h1 {
+        font-size: 1.5rem;
+    }
+    .overview-card {
+        padding: 16px 8px;
+    }
+    .alert-detail-panel {
+        padding: 12px 4px;
+    }
+}
+/* --- End Modern Doctor Alerts Styles --- */

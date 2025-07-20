@@ -1,0 +1,203 @@
+/* forget_password.css */
+/* This file contains styles specifically for the forget password page,
+   duplicating the styles from login.css for independent theming if needed. */
+
+*{
+    padding: 0;
+    margin: 0;
+    box-sizing: border-box;
+}
+
+:root {
+  /* Base Colors */
+  --background-color: #f7f7f7;
+  --primary-color: #2980b9;
+  --secondary-color: #7f8c8d;
+  --button-color:#3498db;
+  --header-footer-color: #2c3e50;
+  --panel-bg-color: #34495e;
+  --alert-color: #e74c3c;
+
+  /* Text Colors */
+  --text-primary: #2c3e50;
+  --text-secondary: #7f8c8d;
+  --text-on-dark: #ffffff;
+}
+
+html body {
+    font-family: 'Roboto', sans-serif;
+    background: var(--background-color); /* Subtle gray background */
+    overflow: hidden; /* Prevent unnecessary scrolling */
+}
+
+.main-container {
+    /* max-width: 1280px; */
+    margin: 0 auto;
+    padding: 2rem;
+    display: flex;
+    flex-direction: row;
+}
+
+.logobox{
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    width: 60%;
+    /* animation: fadein 01s ease-out; */
+}
+.logo-img{
+    width: 60%;
+    animation: fadein 1s linear;
+    /* position: fixed; */
+}
+
+.formbox{
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 1rem;
+    margin: 2rem 5rem;
+    padding: 1.2rem;
+    max-width: 360px;
+    border-radius: 10px;
+    background-color: white;
+    border: 1px solid #ddd; /* Subtle border for structure */
+    box-shadow: 0 8px 15px rgba(0, 0, 0, 0.1);
+    animation: slideup 1.5s ease-in-out;
+}
+
+h2 {
+    font-size: 1.8em;
+    color: #34495e;
+    font-weight: bold;
+} 
+
+input {
+    margin: 0.78rem  0;
+    padding: 0.8rem;
+    width: 100%;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    font-size: 1rem;
+    background-color: #f9f9f9;
+    transition: border 0.3s ease, box-shadow 0.3s ease;
+}
+
+input:focus {
+    border-color: #2980b9;
+    box-shadow: 0 0 8px rgba(41, 128, 185, 0.4);
+    outline: none;
+}
+
+button {
+    width: 100%;
+    padding: 12px;
+    margin: 15px 0;
+    background: #3498db;
+    color: #ffffff;
+    border: none;
+    border-radius: 5px;
+    font-size: 1.1em;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background 0.3s, transform 0.2s ease-in-out;
+}
+
+button:hover {
+    background: #2980b9;
+    transform: scale(1.03);
+}
+
+.footer{
+    font-size: 0.80rem;
+    color: var(--text-secondary);
+}
+
+.footer a{
+    text-decoration: none;
+    color: var(--button-color);
+    font-size: 0.89rem;
+    font-weight: bold;
+}
+
+.footer a:hover{
+    color: var(--text-primary);
+}
+
+.form-description { /* Added for the description paragraph */
+    font-size: 0.9em;
+    color: var(--text-secondary);
+    text-align: center;
+    margin-bottom: 15px;
+}
+
+.info-message { /* Added for the message paragraph (Django messages) */
+    font-size: 0.9em;
+    color: green; /* Or a variable for success messages */
+    text-align: center;
+    margin-top: 10px;
+}
+/* You can add styling for .error messages too if Django messages framework uses that tag */
+.errorlist, .error {
+    color: var(--alert-color);
+    font-size: 0.9em;
+    margin-top: 5px;
+    list-style-type: none;
+    padding: 0;
+}
+
+
+@media (max-width:780px) {
+    html body{
+        overflow: scroll;
+    }
+    .main-container{
+        flex-direction: column;
+        justify-content: center;
+    }
+
+    .logobox{
+       
+       width: 100%;
+      
+    }
+    .logo-img{
+        margin: 0 auto ;
+        width: 50%;
+        height: 50%;
+    }
+    .formbox{
+      margin: 0 auto;
+     
+    }
+}
+
+
+@keyframes slideup {
+
+    0%{
+        opacity: 0;
+        transform: translateY(50px) ;
+    }
+
+    100%{
+        opacity: 1;
+        transform: translateY(0);
+    }
+    
+}
+
+@keyframes fadein {
+
+    0%{
+        opacity: 0;
+        transform: scale(0.9);
+    }
+
+    100%{
+        opacity: 1;
+        transform: scale(1);
+    }
+    
+}

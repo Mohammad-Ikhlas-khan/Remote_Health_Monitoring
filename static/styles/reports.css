@@ -1,0 +1,739 @@
+*{
+    padding: 0;
+    margin: 0;
+    box-sizing: border-box;
+}
+
+:root {
+  /* Base Colors */
+  --background-color: #f4f6f9;
+  --primary-color: #2980b9;
+  --secondary-color: #7f8c8d;
+  --button-color:#3498db;
+  --header-footer-color: #2c3e50;
+  --panel-bg-color: #34495e;
+  --alert-color: #e74c3c;
+  --box-background-color:white;
+  --normal-color:green;
+  /* Text Colors */
+  --text-primary: #2c3e50;
+  --text-secondary: #7f8c8d;
+  --text-on-dark: #ffffff;
+}
+
+#logout-a{
+     color: var(--text-on-dark);
+    text-decoration: none;
+    font-size: 1.1rem;
+    font-weight: 600;
+    padding: 0.7rem;
+    transition: all 0.2s ease-in 0s;
+}
+#logout-a:hover{
+    background-color: var(--button-color);
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+    border-radius: 0.3rem;
+    color: var(--text-on-dark);
+}
+.Critical{
+  color: var(--alert-color);
+  font-weight: bold;
+}
+.normal{
+  color: var(--normal-color);
+  font-weight: bold;
+}
+
+
+html body {
+    font-family: 'Roboto', sans-serif;
+    background: var(--background-color); /* Subtle gray background */
+}
+
+.header{
+      background-color: var(--header-footer-color);
+}
+.header-container{
+    display: flex;
+    flex-direction: row;
+    max-width: 1100px;
+    justify-content: space-between;
+    align-items: center;
+    margin: 0 auto;
+    /* padding: 2rem; */
+    color: white;
+    gap: 2rem;
+}
+
+.logoside{
+ width: 9%;
+  height:5.9rem;
+   animation: slideDown 0.9s ease-in-out;
+  animation-iteration-count: 1;
+  animation-fill-mode: forwards; 
+}
+.logoside img{
+    width: 100%;
+    height: 100%;
+    
+}
+
+.main-nav {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between; 
+    align-items: center;
+    gap: 0.56rem;
+    animation: slideDown 1.2s ease-in-out;
+  animation-iteration-count: 1;
+  animation-fill-mode: forwards;
+}
+
+.main-nav a{
+    color: var(--text-on-dark);
+    text-decoration: none;
+    font-size: 1.1rem;
+    font-weight: 600;
+    padding: 0.7rem;
+    transition: all 0.2s ease-in 0s;
+}
+
+.main-nav a:hover{
+    background-color: var(--button-color);
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+    border-radius: 0.3rem;
+    color: var(--text-on-dark);
+}
+.main-nav .active{
+     background-color: var(--button-color);
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+    border-radius: 0.3rem;
+    color: var(--text-on-dark);
+}
+
+.rightside{
+    display: flex;
+    flex-direction: row;
+    flex-direction: center;
+    align-items: center;
+    gap: 0.98rem;
+    animation: slideDown 1.4s ease-in-out;
+  animation-iteration-count: 1;
+  animation-fill-mode: forwards;
+    /* text-decoration: none; */
+}
+.profile-name{
+    text-decoration: none;
+    color: var(--text-on-dark);
+    font-size: 1.1rem;
+    font-weight: 600;
+}
+.notification{
+    color: var(--text-on-dark);
+    font-size: 1.1rem;
+    font-weight: 600;
+    text-decoration: none;
+    transition: all 0.3s ease-in;
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    gap: 0.23rem;
+}
+.m-notification , .badge{
+   display: none;
+}
+.notification img{
+    width: 1.3rem;
+    height: 1.3rem;
+}
+.notification:hover{
+   animation: bounce 3s ease-in;
+  animation-iteration-count: 1;
+    color: var(--primary-color);
+}
+.profile{
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    gap: 0.2rem;
+    text-decoration: none;
+}
+.profile-img{
+    width: 2.7rem;
+    height: 2.7rem;
+    border-radius: 9999px;
+    object-fit: cover;
+}
+
+.menu-button{
+    border: none;
+    background: none;
+    display: none;
+}
+
+.menu-icon{
+    height:3.5rem;
+    width:3.5rem;
+}
+
+
+/*  Main container  */
+.main-content{
+  margin: 0 auto;
+  padding: 1.2rem;
+  max-width: 1100px;
+  background-color: var(--background-color);
+}
+
+
+   /* body {
+    font-family: Arial, sans-serif;
+    margin: 20px;
+    background-color: #f4f7f6;
+    color: #333;
+} */
+
+/* .container {
+    max-width: 900px;
+    margin: 0 auto;
+    background-color: #fff;
+    padding: 30px;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+} */
+
+/* h1, h2 {
+    color: #2c3e50;
+    text-align: center;
+    margin-bottom: 25px;
+} */
+
+.input-section {
+    border: 1px solid #ddd;
+    padding: 20px;
+    border-radius: 5px;
+    margin-bottom: 30px;
+    background-color: #fcfcfc;
+}
+
+.form-group {
+    margin-bottom: 15px;
+    display: flex;
+    flex-wrap: wrap; /* Allows labels and inputs to wrap */
+    align-items: center; /* Vertically aligns items */
+}
+
+.form-group label {
+    flex: 1; /* Takes up available space */
+    min-width: 120px; /* Minimum width for labels */
+    margin-right: 15px;
+    font-weight: bold;
+    color: #555;
+}
+
+.form-group input[type="text"],
+.form-group input[type="date"],
+.form-group select,
+.form-group textarea {
+    flex: 2; /* Takes up more space than label */
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    box-sizing: border-box; /* Include padding in element's total width and height */
+}
+
+.form-group textarea {
+    resize: vertical; /* Allow vertical resizing */
+}
+
+.form-group.full-width {
+    flex-direction: column; /* Stack label and input for full-width fields */
+    align-items: flex-start;
+}
+
+.form-group.full-width label {
+    width: 100%;
+    margin-bottom: 8px;
+}
+
+.form-group.full-width textarea,
+.form-group.full-width input {
+    width: 100%;
+}
+
+
+.patient-list-section button {
+    background-color: #3498db;
+    color: white;
+    padding: 12px 20px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 16px;
+    transition: background-color 0.3s ease;
+    display: block; /* Make buttons take full width if desired, or adjust as needed */
+    margin-top: 20px;
+}
+
+.patient-list-section button:hover {
+    background-color: #2980b9;
+}
+
+#printReportBtn {
+    background-color: #2ecc71;
+    margin-top: 20px;
+}
+
+#printReportBtn:hover {
+    background-color: #27ae60;
+}
+
+
+/* Report Section Styling */
+.report-section {
+    border: 1px solid #ddd;
+    padding: 25px;
+    border-radius: 5px;
+    background-color: #fcfcfc;
+    display: none; /* Hidden by default, shown by JS */
+}
+
+.report-header {
+    text-align: center;
+    margin-bottom: 20px;
+    border-bottom: 1px solid #eee;
+    padding-bottom: 10px;
+}
+
+.report-details p {
+    margin-bottom: 10px;
+    line-height: 1.6;
+}
+
+.report-details p strong {
+    color: #444;
+    display: inline-block; /* Helps align content if needed */
+    min-width: 120px; /* Adjust as necessary for alignment */
+}
+
+.report-content {
+    background-color: #f9f9f9;
+    padding: 10px;
+    border-left: 3px solid #3498db;
+    margin-left: 20px; /* Indent content for readability */
+    white-space: pre-wrap; /* Preserves formatting (newlines) from textarea */
+}
+
+/* Print specific styles */
+@media print {
+    body {
+        margin: 0;
+        background-color: white;
+    }
+    .container {
+        box-shadow: none;
+        border: none;
+        padding: 0;
+    }
+    .input-section, #generateReportBtn {
+        display: none; /* Hide input form and generate button when printing */
+    }
+    .report-section {
+        display: block !important; /* Ensure report is visible when printing */
+        border: none;
+        padding: 0;
+    }
+    #printReportBtn {
+        display: none; /* Hide print button itself */
+    }
+    /* Add any other specific styles for printing here */
+}
+
+.patient-list-section {
+    border: 1px solid #ddd;
+    padding: 20px;
+    border-radius: 5px;
+    margin-bottom: 30px;
+    background-color: #fcfcfc;
+    text-align: center; /* Center align for selector and buttons */
+}
+
+#patientSelector {
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    width: 60%; /* Adjust as needed */
+    margin-right: 10px;
+    margin-bottom: 15px; /* Space from buttons below */
+}
+
+.patient-list-section button {
+    display: inline-block;
+    width: auto;
+    margin: 5px;
+}
+
+/* Hide input form and report output by default, JS will show them */
+#patientInputForm, #patientReportOutput {
+    display: none;
+}
+
+
+@media screen and (max-width:900px) {
+  .header{
+    position: relative;
+    
+  }
+  #logout-a{
+    display: none;
+  }
+   .header-container{
+        /* padding-inline: 0.8rem; */
+        padding-bottom: -5.3rem;
+        gap: 1.2rem;
+        justify-content: space-between;
+      }
+      .main-nav{
+        display: none;
+      }
+
+      .notification, .profile{
+        display: none;
+      }
+
+      .m-notification{
+        /* display: block; */
+        /* width: 8rem;
+        height: 8rem; */
+        font-size: 1.4rem;
+        position: relative;
+        display: inline-block;
+      }
+       .badge{
+        position: absolute;
+                top: 27px;
+        right: 75px;
+        padding: 0.1px 4px;
+        border-radius: 50%;
+        background: red;
+        color: white;
+        display: block;
+      }
+
+        .menu-button{
+        display: block;
+        width: 5rem;
+        height: 5rem;
+    }
+    .menu-icon{
+      width: 100%;
+      height: 100%;
+    }
+
+    .logoside{
+      width: 20%;
+      height: 4.5rem;
+      
+    }
+
+    .rightside{
+      gap: 0;
+    }
+    
+    .main-nav{
+        position: absolute;
+        top: 100%;
+        /* left: 50%; */
+        background-color: var(--panel-bg-color);
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        /* border-radius: 8px; */
+        padding: 1rem;
+        flex-direction: column;
+        min-width: 150px;
+        width: 100%;
+        display: none;
+        opacity: 0;
+        /* animation: slideup 0.8s ease-out; */
+    }
+
+    .main-nav.show{
+        display: flex;
+        opacity: 1;
+       animation: slidedown 0.4s ease--in-out;
+
+    }
+    #home-a.show1{
+       animation: slidedown 0.4s ease-in-out;
+    }
+    #patient-a.show2{
+       animation: slidedown 0.6s ease-in-out;
+    }
+    #alert-a.show3{
+       animation: slidedown 0.8s ease-in-out;
+    }
+    #reports-a.show4{
+       animation: slidedown 1s ease-out;
+    }
+    #setting-a.show5{
+       animation: slidedown 1.2s ease-in-out;
+    }
+    .main-header{
+      margin-top: 5rem;
+    }
+
+    
+}
+
+@media screen and (min-width:500px){
+      
+     .logoside{
+      /* width: 0%; */
+      height: 6rem;
+    }
+    .badge{
+        position: absolute;
+         top: 28px;
+        right: 75px;
+        padding: 0.1px 4px;
+        border-radius: 50%;
+        background: red;
+        color: white;
+    
+      }
+      .main-nav{
+              top: 100%;
+
+          }
+
+    
+    
+    }
+
+/* @keyframes bounce {
+  0%, 20%, 50%, 80%, 100% {
+    transform: translateY(0);
+  }
+  40% {
+    transform: translateY(-25px);
+  }
+  60% {
+    transform: translateY(-15px);
+  }
+} */
+
+/* @keyframes slideDown {
+  0% {
+    transform: translateY(-100px);
+    opacity: 0;
+  }
+  100% {
+    transform: translateY(0);
+    opacity: 1;
+  }
+} */
+
+@keyframes slideDown1 {
+  0% {
+    transform: translateY(-100px);
+    opacity: 0;
+  }
+  100% {
+    transform: translateY(0);
+    opacity: 1;
+  }
+} 
+
+@keyframes slidedown {
+
+    0%{
+        opacity: 0;
+        transform: translateY(-20px) ;
+    }
+
+    100%{
+        opacity: 1;
+        transform: translateY(0);
+    }
+    
+}
+
+/* --- Modern Medical Reports Styles --- */
+body {
+    background: #f4f7fa;
+    font-family: 'Segoe UI', Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+}
+
+.main-content {
+    max-width: 950px;
+    margin: 48px auto 0 auto;
+    background: #fff;
+    border-radius: 18px;
+    box-shadow: 0 8px 32px rgba(34,48,70,0.13);
+    padding: 48px 60px 40px 60px;
+}
+
+.main-content h1 {
+    font-size: 2.3rem;
+    font-weight: 800;
+    color: #223046;
+    margin-bottom: 28px;
+    text-align: left;
+}
+
+.report-controls {
+    display: flex;
+    gap: 18px;
+    margin-bottom: 32px;
+    justify-content: flex-start;
+}
+
+.action-button {
+    min-width: 160px;
+    padding: 12px 0;
+    font-size: 1.12rem;
+    font-weight: 700;
+    background: linear-gradient(90deg, #3498db 0%, #6dd5fa 100%);
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(52,152,219,0.10);
+    cursor: pointer;
+    transition: background 0.2s, box-shadow 0.2s;
+}
+.action-button:hover, .action-button.active {
+    background: linear-gradient(90deg, #217dbb 0%, #3498db 100%);
+    box-shadow: 0 4px 16px rgba(52,152,219,0.18);
+}
+
+.content-section {
+    margin-top: 18px;
+    background: #f7fafc;
+    border-radius: 14px;
+    box-shadow: 0 2px 12px rgba(52,152,219,0.10);
+    padding: 32px 36px 28px 36px;
+}
+
+.report-form .form-group {
+    margin-bottom: 22px;
+    display: flex;
+    flex-direction: column;
+}
+.report-form label {
+    font-weight: 600;
+    color: #223046;
+    margin-bottom: 7px;
+}
+.report-form input, .report-form select, .report-form textarea {
+    padding: 12px;
+    border: 1px solid #cfd8dc;
+    border-radius: 7px;
+    font-size: 1.05rem;
+    background: #fff;
+    transition: border 0.2s;
+}
+.report-form input:focus, .report-form select:focus, .report-form textarea:focus {
+    border: 1.5px solid #3498db;
+    outline: none;
+}
+.form-actions {
+    display: flex;
+    gap: 16px;
+    margin-top: 18px;
+}
+.save-button, .cancel-button {
+    min-width: 120px;
+    padding: 10px 0;
+    font-size: 1.08rem;
+    font-weight: 700;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: background 0.2s, box-shadow 0.2s;
+}
+.save-button {
+    background: linear-gradient(90deg, #3498db 0%, #6dd5fa 100%);
+    color: #fff;
+}
+.save-button:hover {
+    background: linear-gradient(90deg, #217dbb 0%, #3498db 100%);
+}
+.cancel-button {
+    background: #eaf4fb;
+    color: #3498db;
+}
+.cancel-button:hover {
+    background: #d0e6f7;
+}
+
+.report-list {
+    margin-top: 18px;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: 22px;
+}
+.report-card {
+    background: #fff;
+    border-radius: 12px;
+    box-shadow: 0 2px 12px rgba(52,152,219,0.10);
+    padding: 22px 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    transition: box-shadow 0.2s;
+}
+.report-card h3 {
+    color: #3498db;
+    font-size: 1.18rem;
+    font-weight: 700;
+    margin-bottom: 4px;
+}
+.report-card p {
+    color: #223046;
+    font-size: 1.05rem;
+    margin: 2px 0;
+}
+.report-card-actions {
+    display: flex;
+    gap: 10px;
+    margin-top: 10px;
+}
+.filters {
+    display: flex;
+    gap: 14px;
+    margin-bottom: 18px;
+}
+.filters input, .filters select {
+    padding: 10px;
+    border: 1px solid #cfd8dc;
+    border-radius: 7px;
+    font-size: 1.05rem;
+    background: #fff;
+}
+
+@media (max-width: 900px) {
+    .main-content {
+        padding: 24px 8px;
+    }
+    .content-section {
+        padding: 18px 6px 14px 6px;
+    }
+    .report-list {
+        grid-template-columns: 1fr;
+    }
+}
+@media (max-width: 600px) {
+    .main-content {
+        padding: 8px 2px;
+    }
+    .main-content h1 {
+        font-size: 1.5rem;
+    }
+    .content-section {
+        padding: 8px 2px;
+    }
+}
+/* --- End Modern Medical Reports Styles --- */

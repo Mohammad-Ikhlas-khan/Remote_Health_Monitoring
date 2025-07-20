@@ -1,0 +1,299 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Profile - Patient Portal</title>
+    <!-- Inter Font -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{% static 'styles/profile.css' %}">
+    
+</head>
+<body>
+    <!-- Header Nav bar Profile -->
+    <div class="header">
+       <header class="header-container">
+        <div class="logoside">
+            <img src="{% static 'images/logo.png' %}" alt="logo" loading="lazy">
+        </div>
+        <div class="main-nav" id="navMenu">
+                    <a href="{% url 'patient_dashboard' %}" id="home-a" >Home</a>
+                    <a href="{% url 'patient_vitals_history' %}" id="alert-a" >Vitals History</a>
+                    <a href="{% url 'patient_health_records' %}" id="patient-a">Health Records</a>
+                    <a href="{% url 'patient_messages' %}" id="reports-a">Messages</a></li>
+                    <a href="{% url 'patient_profile' %}" id="setting-a"  class="active">Profile</a>
+            
+        </div>
+        <div class="rightside">
+            <a href="{% url 'patient_notifications' %}" class="notification  active">Notifications 🔔</a>
+            <a href="{% url 'logout' %}" id="logout-a">Logout</a>
+            <a href="{% url 'patient_notifications' %}" class="m-notification"  active>🔔 </a>
+            <span class="badge">{{ unread_notifications_count }}</span>
+            <button type="button" class="menu-button" onclick="toggleMenu()">
+                <img src="{{ profile_pic_url }}" alt="Profile Picture" class="profile-pic">
+            </button>
+            <span class="patient-name">{{ request.user.first_name }} {{ request.user.last_name }}</span>
+        </div>
+       </header>
+    </div>
+
+    <div class="main-content">
+        <h1>Your Profile</h1>
+
+        <div class="profile-settings-grid">
+            <!-- Basic Information -->
+            <div class="settings-section basic-info-section">
+                <h2>Basic Information</h2>
+                <form id="basicInfoForm" method="POST" action="{% url 'patient_profile' %}">
+                    {% csrf_token %}
+                    <div class="profile-pic-container">
+                        <img id="previewImage" src="{{ patient_profile.profile_picture_url|default:'https://placehold.co/40x40/f0f4f7/556080?text=PJ' }}" alt="Profile Picture" class="current-profile-pic">
+                        <label for="profilePic" class="upload-button">Change Photo</label>
+                        <input type="file" id="profilePic" name="profile_picture" accept="image/*" style="display: none;">
+                        <!-- Hidden field to store URL if no new file is uploaded -->
+                        <input type="hidden" name="profile_picture_url" value="{{ patient_profile.profile_picture_url|default:'' }}">
+                    </div>
+                    <div class="form-group">
+                        <label for="firstName">First Name:</label>
+                        <input type="text" id="firstName" name="first_name" value="{{ form.first_name.value|default:'' }}" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="lastName">Last Name:</label>
+                        <input type="text" id="lastName" name="last_name" value="{{ form.last_name.value|default:'' }}" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="email">Email:</label>
+                        <input type="email" id="email" name="email" value="{{ form.email.value|default:'' }}" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="dob">Date of Birth:</label>
+                        <input type="date" id="dob" name="date_of_birth" value="{{ form.date_of_birth.value|date:'Y-m-d'|default:'' }}">
+                    </div>
+                    <div class="form-group">
+                        <label for="gender">Gender:</label>
+                        <select id="gender" name="gender">
+                            <option value="">Select Gender</option>
+                            <option value="male" {% if form.gender.value == 'male' %}selected{% endif %}>Male</option>
+                            <option value="female" {% if form.gender.value == 'female' %}selected{% endif %}>Female</option>
+                            <option value="other" {% if form.gender.value == 'other' %}selected{% endif %}>Other</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="bloodGroup">Blood Group:</label>
+                        <input type="text" id="bloodGroup" name="blood_group" value="{{ patient_profile.blood_group|default:'' }}" placeholder="e.g., A+, O-">
+                    </div>
+                    <div class="form-actions">
+                        <button type="submit" class="save-button">Save Basic Info</button>
+                    </div>
+                </form>
+            </div>
+
+            <!-- Contact Information -->
+            <div class="settings-section contact-info-section">
+                <h2>Contact Information</h2>
+                <form id="contactInfoForm" method="POST" action="{% url 'patient_profile' %}">
+                    {% csrf_token %}
+                    <div class="form-group">
+                        <label for="contactNumber">Contact Number:</label>
+                        <input type="tel" id="contactNumber" name="contact_number" value="{{ patient_profile.contact_number|default:'' }}">
+                    </div>
+                    <div class="form-group">
+                        <label for="address">Address:</label>
+                        <textarea id="address" name="address" rows="3">{{ patient_profile.address|default:'' }}</textarea>
+                    </div>
+                     <div class="form-actions">
+                        <button type="submit" class="save-button">Save Contact Info</button>
+                    </div>
+                </form>
+            </div>
+
+            <!-- Emergency Contact -->
+            <div class="settings-section emergency-contact-section">
+                <h2>Emergency Contact</h2>
+                <form id="emergencyContactForm" method="POST" action="{% url 'patient_profile' %}">
+                    {% csrf_token %}
+                    <div class="form-group">
+                        <label for="emergencyName">Name:</label>
+                        <input type="text" id="emergencyName" name="emergency_contact_name" value="{{ patient_profile.emergency_contact_name|default:'' }}">
+                    </div>
+                    <div class="form-group">
+                        <label for="emergencyRelationship">Relationship:</label>
+                        <input type="text" id="emergencyRelationship" name="emergency_contact_relationship" value="{{ patient_profile.emergency_contact_relationship|default:'' }}">
+                    </div>
+                    <div class="form-group">
+                        <label for="emergencyPhone">Phone:</label>
+                        <input type="tel" id="emergencyPhone" name="emergency_contact_phone" value="{{ patient_profile.emergency_contact_phone|default:'' }}">
+                    </div>
+                    <div class="form-actions">
+                        <button type="submit" class="save-button">Save Emergency Contact</button>
+                    </div>
+                </form>
+            </div>
+
+            <!-- Medical Information Summary -->
+            <div class="settings-section medical-info-summary">
+                <h2>Medical History Summary</h2>
+                <form id="medicalHistorySummaryForm" method="POST" action="{% url 'patient_profile' %}">
+                    {% csrf_token %}
+                    <div class="form-group">
+                        <label for="medicalHistory">Summary:</label>
+                        <textarea id="medicalHistory" name="medical_history" rows="5">{{ patient_profile.medical_history|default:'' }}</textarea>
+                    </div>
+                    <div class="form-actions">
+                        <button type="submit" class="save-button">Save Medical Summary</button>
+                    </div>
+                </form>
+            </div>
+
+            <!-- Preferences -->
+            <div class="settings-section preferences-section">
+                <h2>Preferences</h2>
+                <form id="preferencesForm" method="POST" action="{% url 'patient_profile' %}">
+                    {% csrf_token %}
+                    <div class="form-group switch-group">
+                        <label for="notificationEnabled">Enable Notifications:</label>
+                        <label class="switch">
+                            <input type="checkbox" id="notificationEnabled" name="notification_enabled" {% if patient_profile.notification_enabled %}checked{% endif %}>
+                            <span class="slider round"></span>
+                        </label>
+                    </div>
+                    <div class="form-group">
+                        <label for="preferredLanguage">Preferred Language:</label>
+                        <select id="preferredLanguage" name="preferred_language">
+                            <option value="en" {% if patient_profile.preferred_language == 'en' %}selected{% endif %}>English</option>
+                            <option value="es" {% if patient_profile.preferred_language == 'es' %}selected{% endif %}>Spanish</option>
+                            <option value="hi" {% if patient_profile.preferred_language == 'hi' %}selected{% endif %}>Hindi</option>
+                            <!-- Add more languages as needed -->
+                        </select>
+                    </div>
+                    <div class="form-actions">
+                        <button type="submit" class="save-button">Save Preferences</button>
+                    </div>
+                </form>
+            </div>
+
+
+            <!-- Account Management -->
+            <div class="settings-section account-management-section">
+                <h2>Account Management</h2>
+                <button class="action-button" onclick="alert('Change Password functionality coming soon!');">Change Password</button>
+                <button class="action-button" onclick="alert('Two-Factor Authentication setup coming soon!');">Enable 2FA</button>
+                <button class="action-button delete-button" onclick="if(confirm('Are you sure you want to delete your account? This action cannot be undone.')){ alert('Account deletion initiated. (Requires backend confirmation)'); }">Delete Account</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // JavaScript for mobile menu toggle (consistent with patient_dashboard.html)
+        function toggleMenu() {
+            const nav = document.getElementById('navMenu');
+            const home = document.getElementById('home-a');
+            const vitals = document.getElementById('alert-a'); // Vitals History
+            const records = document.getElementById('patient-a'); // Health Records
+            const messages = document.getElementById('reports-a'); // Messages
+            const profile = document.getElementById('setting-a'); // Profile
+
+            if (window.innerWidth <= 900) {
+                nav.classList.toggle('show');
+                home.classList.toggle('show1');
+                vitals.classList.toggle('show2');
+                records.classList.toggle('show3');
+                messages.classList.toggle('show4');
+                profile.classList.toggle('show5');
+
+                if (nav.classList.contains('show')) {
+                    nav.style.display = 'flex';
+                    void nav.offsetWidth;
+                } else {
+                    nav.addEventListener('transitionend', () => {
+                        nav.style.display = 'none';
+                    }, { once: true });
+                }
+            }
+        }
+
+        function handleResize() {
+            const nav = document.getElementById('navMenu');
+            const home = document.getElementById('home-a');
+            const vitals = document.getElementById('alert-a');
+            const records = document.getElementById('patient-a');
+            const messages = document.getElementById('reports-a');
+            const profile = document.getElementById('setting-a');
+
+            if (window.innerWidth > 900) {
+                nav.classList.remove('show');
+                nav.style.display = 'flex';
+                home.classList.remove('show1');
+                home.style.display = 'flex';
+                vitals.classList.remove('show2');
+                vitals.style.display = 'flex';
+                records.classList.remove('show3');
+                records.style.display = 'flex';
+                messages.classList.remove('show4');
+                messages.style.display = 'flex';
+                profile.classList.remove('show5');
+                profile.style.display = 'flex';
+            } else {
+                nav.style.display = nav.classList.contains('show') ? 'flex' : 'none';
+                home.style.display = home.classList.contains('show1') ? 'flex' : 'none';
+                vitals.style.display = vitals.classList.contains('show2') ? 'flex' : 'none';
+                records.style.display = records.classList.contains('show3') ? 'flex' : 'none';
+                messages.style.display = messages.classList.contains('show4') ? 'flex' : 'none';
+                profile.style.display = profile.classList.contains('show5') ? 'flex' : 'none';
+            }
+        }
+        window.addEventListener('resize', handleResize);
+        window.addEventListener('DOMContentLoaded', handleResize);
+
+        // Profile Picture Preview
+        const profilePicInput = document.getElementById('profilePic');
+        const previewImage = document.getElementById('previewImage');
+        const profilePictureUrlHiddenInput = document.querySelector('input[name="profile_picture_url"]');
+
+        if (profilePicInput && previewImage) {
+            profilePicInput.addEventListener('change', function(e) {
+                const file = e.target.files[0];
+                if (file) {
+                    const reader = new FileReader();
+                    reader.onload = function(ev) {
+                        previewImage.src = ev.target.result;
+                        // Clear the hidden URL field as a new file is being uploaded
+                        profilePictureUrlHiddenInput.value = ''; 
+                    };
+                    reader.readAsDataURL(file);
+                }
+            });
+
+            // Handle initial image loading errors if the URL is broken
+            previewImage.onerror = () => {
+                previewImage.src = 'https://placehold.co/40x40/f0f4f7/556080?text=PJ';
+            };
+        }
+
+        // Form Submission Logic (Conceptual - actual submission handled by Django's form processing)
+        // These are mostly for client-side confirmation messages.
+        document.getElementById('basicInfoForm').addEventListener('submit', (event) => {
+            // No preventDefault here, let Django handle the form submission
+            alert('Basic Information saved!');
+        });
+
+        document.getElementById('contactInfoForm').addEventListener('submit', (event) => {
+            alert('Contact Information saved!');
+        });
+
+        document.getElementById('emergencyContactForm').addEventListener('submit', (event) => {
+            alert('Emergency Contact saved!');
+        });
+
+        document.getElementById('medicalHistorySummaryForm').addEventListener('submit', (event) => {
+            alert('Medical History Summary saved!');
+        });
+
+        document.getElementById('preferencesForm').addEventListener('submit', (event) => {
+            alert('Preferences saved!');
+        });
+
+    </script>
+</body>
+</html>

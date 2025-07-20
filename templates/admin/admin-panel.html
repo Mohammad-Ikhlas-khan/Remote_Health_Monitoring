@@ -1,0 +1,143 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Welcome Admin</title>
+    <link rel="stylesheet" href="{% static 'styles/admin-panel.css' %}">
+</head>
+<body>
+    <div class="header">
+       <header class="header-container">
+        <div class="logoside">
+            <img src="{% static 'innerimg/logo.png' %}" alt="logo" loading="lazy">
+        </div>
+        <div class="main-nav" id="navMenu">
+            <a href="{% url 'admin_dashboard' %}" Id="home-a" class="active">Home</a>
+        <a href="{% url 'admin_register_user' %}" id="patient-a">Register Users</a>
+        <a href="{% url 'admin_view_records' %}" id="alert-a">View Records</a>
+        <a href="{% url 'admin_register_device' %}" id="device-a">Register Device</a>
+        <a href="{% url 'admin_settings' %}" id="setting-a">Settings</a>
+        </div>
+        <div class="rightside">
+            <a href="{% url 'admin_notifications' %}" class="notification">Notifications 🔔</a>
+            <a href="{% url 'logout' %}" id="logout-a">Logout</a>
+            <a href="{% url 'admin_notifications' %}" class="m-notification">🔔 </a><span class="badge">3</span>
+            <button type="button" class="menu-button" onclick="toggleMenu()"><img src="{% static 'images/hamburger-menu-more.svg' %}" alt="menu-icon" class="menu-icon"></button>
+        </div>
+        </header>
+    </div>
+
+    <div class="main-container">
+      <h2 id="greeting"></h2>
+        <main class="main-content">
+            <h2 class="main-header">Dashboard</h2>
+            <div class="cards-container">
+                <div class="data-card">
+                    <h2 class="no-info"><strong>{{ total_doctors }}</strong></h2>
+                    <span class="data-name">Doctors</span></div>
+                <div class="data-card">
+                    <h2 class="no-info"><strong>{{ total_patients }}</strong></h2>
+                    <span class="data-name">Patients</span></div>
+                <div class="data-card">
+                    <h2 class="no-info"><strong>{{ total_devices }}</strong></h2>
+                    <span class="data-name">Devices</span></div>
+                <div class="data-card">
+                    <h2 class="no-info"><strong>{{ active_alerts_count }}</strong></h2>
+                    <span class="data-name">Active Alerts</span></div>
+            </div>
+        </main>
+
+        <section class="recent_activities">
+          <h2 class="activites-head">Recent Activity Feed (Live Updates)</h2>
+          <ul class="activities-feed">
+           {% if recent_activities %}
+                {% for activity in recent_activities %}
+                    <li><span>{{ activity.timestamp|date:"[Y-m-d H:i:s]" }}</span> - <strong>{{ activity.notification_type|capfirst }}:</strong> {{ activity.message }}</li>
+                {% endfor %}
+            {% else %}
+                <li>No recent activity to display.</li>
+            {% endif %}
+          </ul>
+        </section>
+    </div>
+
+    <script>
+    const nav = document.getElementById('navMenu');
+    const home = document.getElementById('home-a');
+    const patient = document.getElementById('patient-a');
+    const Alert = document.getElementById('alert-a');
+    const reports = document.getElementById('reports-a');
+    const setting = document.getElementById('setting-a');
+    const toggleBtn = document.querySelector('.menu-button');
+
+    function toggleMenu() {
+      if (window.innerWidth <= 900) {
+        nav.classList.toggle('show');
+        home.classList.toggle('show1');
+        patient.classList.toggle('show2');
+        Alert.classList.toggle('show3');
+        if (reports) reports.classList.toggle('show4');
+        setting.classList.toggle('show5');
+
+        if (nav.classList.contains('show')) {
+          nav.style.display = 'flex';
+          void nav.offsetWidth;
+        } else {
+          nav.addEventListener('transitionend', () => {
+            nav.style.display = 'none';
+          }, { once: true });
+        }
+      }
+    }
+
+    function handleResize() {
+      if (window.innerWidth > 900) {
+        nav.classList.remove('show');
+        nav.style.display = 'flex';
+        home.classList.remove('show1');
+        home.style.display = 'flex';
+        patient.classList.remove('show2');
+        patient.style.display = 'flex';
+        Alert.classList.remove('show3');
+        Alert.style.display = 'flex';
+        if (reports) {
+            reports.classList.remove('show4');
+            reports.style.display = 'flex';
+        }
+        setting.classList.remove('show5');
+        setting.style.display = 'flex';
+
+      } else {
+        nav.style.display = nav.classList.contains('show') ? 'flex' : 'none';
+      }
+    }
+
+    window.addEventListener('resize', handleResize);
+    window.addEventListener('DOMContentLoaded', handleResize);
+
+
+     function updateGreeting() {
+        const now = new Date();
+        const hour = now.getHours();
+        let greetingText;
+
+        if (hour >= 5 && hour < 12) {
+            greetingText = "Good Morning";
+        } else if (hour >= 12 && hour < 17) {
+            greetingText = "Good Afternoon";
+        } else if (hour >= 17 && hour < 20) {
+            greetingText = "Good Evening";
+        } else {
+            greetingText = "Good Night";
+        }
+        // Use Django context for admin name, fallback to 'Admin User'
+        const userName = "{{ request.user.first_name|default:'Admin' }} {{ request.user.last_name|default:'User' }}".trim();
+        document.getElementById("greeting").textContent = `${greetingText}, ${userName}`;
+    }
+
+    updateGreeting();
+    </script>
+</body>
+</html>

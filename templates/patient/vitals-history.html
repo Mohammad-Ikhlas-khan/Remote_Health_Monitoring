@@ -1,0 +1,368 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vitals History - Patient Portal</title>
+    <!-- Inter Font -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{% static 'styles/vital-history.css' %}">
+</head>
+<body>
+     <!-- Header Nav bar Profile -->
+    <div class="header">
+       <header class="header-container">
+        <div class="logoside">
+            <img src="{% static 'images/logo.png' %}" alt="logo" loading="lazy">
+        </div>
+        <div class="main-nav" id="navMenu">
+                    <a href="{% url 'patient_dashboard' %}" id="home-a" >Home</a>
+                    <a href="{% url 'patient_vitals_history' %}" id="alert-a"  class="active">Vitals History</a>
+                    <a href="{% url 'patient_health_records' %}" id="patient-a">Health Records</a>
+                    <a href="{% url 'patient_messages' %}" id="reports-a">Messages</a></li>
+                    <a href="{% url 'patient_profile' %}" id="setting-a"  >Profile</a>
+            
+        </div>
+        <div class="rightside">
+            <a href="{% url 'patient_notifications' %}" class="notification  active">Notifications 🔔</a>
+            <a href="{% url 'logout' %}" id="logout-a">Logout</a>
+            <a href="{% url 'patient_notifications' %}" class="m-notification"  active>🔔 </a>
+            <span class="badge">{{ unread_notifications_count }}</span>
+            <button type="button" class="menu-button" onclick="toggleMenu()">
+                <img src="{{ profile_pic_url }}" alt="Profile Picture" class="profile-pic">
+            </button>
+            <span class="patient-name">{{ request.user.first_name }} {{ request.user.last_name }}</span>
+        </div>
+       </header>
+    </div>
+
+    <div class="center-vertical-container">
+        <div class="main-content">
+            <h1>Your Vitals History</h1>
+
+            <div class="chart-section">
+                <h2>Vitals Trend</h2>
+                <canvas id="vitalsChart" height="300"></canvas>
+            </div>
+
+            <div class="vitals-bottom-section">
+            <div class="table-section">
+                <h2>Detailed Vitals Log</h2>
+                <div class="filters">
+                    <input type="text" id="searchInput" placeholder="Search by vital type or status..." onkeyup="filterTable()">
+                    <select id="typeFilter" onchange="filterTable()">
+                        <option value="">All Types</option>
+                        <option value="temperature">Temperature</option>
+                            <option value="pulse_rate">Pulse Rate</option>
+                            <option value="ecg">ECG</option>
+                    </select>
+                    <select id="statusFilter" onchange="filterTable()">
+                        <option value="">All Statuses</option>
+                        <option value="Normal">Normal</option>
+                        <option value="High">High</option>
+                        <option value="Low">Low</option>
+                        <option value="Irregular">Irregular</option>
+                    </select>
+                </div>
+                <div class="table-responsive">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Date & Time</th>
+                                <th>Vital Sign</th>
+                                <th>Value</th>
+                                <th>Unit</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody id="vitalsTableBody">
+                            {% for vital in latest_vitals %}
+                            <tr data-type="{{ vital.vital_type }}" data-status="{{ vital.status|default:'N/A' }}">
+                                <td>{{ vital.timestamp|date:"M d, Y H:i" }}</td>
+                                <td>{{ vital.vital_type|capfirst }}</td>
+                                <td>{{ vital.value }}</td>
+                                <td>{{ vital.unit|default:"N/A" }}</td>
+                                <td class="status-{{ vital.status|lower }}">{{ vital.status|default:"N/A" }}</td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="5" class="empty-message">No vital records found.</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                <div class="pagination">
+                    <button id="prevPageButton" disabled>&laquo; Previous</button>
+                    <span id="pageInfo">Page 1 of 1</span>
+                    <button id="nextPageButton" disabled>Next &raquo;</button>
+                </div>
+                <button id="exportDataButton" class="action-button">Export Data (CSV)</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <style>
+    #vitalsChart {
+      min-height: 300px;
+      width: 100% !important;
+      max-width: 100vw;
+      display: block;
+    }
+    .chart-section {
+      width: 100vw;
+      margin-left: calc(-50vw + 50%);
+      padding: 0 0.5rem;
+    }
+    </style>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns"></script>
+    <script>
+        // JavaScript for mobile menu toggle (consistent with patient_dashboard.html)
+        function toggleMenu() {
+            const nav = document.getElementById('navMenu');
+            const home = document.getElementById('home-a');
+            const vitals = document.getElementById('alert-a'); // Vitals History
+            const records = document.getElementById('patient-a'); // Health Records
+            const messages = document.getElementById('reports-a'); // Messages
+            const profile = document.getElementById('setting-a'); // Profile
+
+            if (window.innerWidth <= 900) {
+                nav.classList.toggle('show');
+                home.classList.toggle('show1');
+                vitals.classList.toggle('show2');
+                records.classList.toggle('show3');
+                messages.classList.toggle('show4');
+                profile.classList.toggle('show5');
+
+                if (nav.classList.contains('show')) {
+                    nav.style.display = 'flex';
+                    void nav.offsetWidth;
+                } else {
+                    nav.addEventListener('transitionend', () => {
+                        nav.style.display = 'none';
+                    }, { once: true });
+                }
+            }
+        }
+
+        function handleResize() {
+            const nav = document.getElementById('navMenu');
+            const home = document.getElementById('home-a');
+            const vitals = document.getElementById('alert-a');
+            const records = document.getElementById('patient-a');
+            const messages = document.getElementById('reports-a');
+            const profile = document.getElementById('setting-a');
+
+            if (window.innerWidth > 900) {
+                nav.classList.remove('show');
+                nav.style.display = 'flex';
+                home.classList.remove('show1');
+                home.style.display = 'flex';
+                vitals.classList.remove('show2');
+                vitals.style.display = 'flex';
+                records.classList.remove('show3');
+                records.style.display = 'flex';
+                messages.classList.remove('show4');
+                messages.style.display = 'flex';
+                profile.classList.remove('show5');
+                profile.style.display = 'flex';
+            } else {
+                nav.style.display = nav.classList.contains('show') ? 'flex' : 'none';
+                home.style.display = home.classList.contains('show1') ? 'flex' : 'none';
+                vitals.style.display = vitals.classList.contains('show2') ? 'flex' : 'none';
+                records.style.display = records.classList.contains('show3') ? 'flex' : 'none';
+                messages.style.display = messages.classList.contains('show4') ? 'flex' : 'none';
+                profile.style.display = profile.classList.contains('show5') ? 'flex' : 'none';
+            }
+        }
+        window.addEventListener('resize', handleResize);
+        window.addEventListener('DOMContentLoaded', handleResize);
+
+        // --- Vitals Chart and Table Logic ---
+        const allVitalsData = [
+            {% for vital in vitals %}
+            {
+                timestamp: new Date("{{ vital.timestamp|date:'Y-m-d H:i:s' }}"),
+                type: "{{ vital.vital_type }}",
+                value: {{ vital.value }},
+                unit: "{{ vital.unit|default:'' }}",
+                status: "{{ vital.status|default:'' }}"
+            },
+            {% endfor %}
+        ];
+        const chartVitalsData = [
+            {% for vital in chart_vitals %}
+            {
+                timestamp: new Date("{{ vital.timestamp|date:'Y-m-d H:i:s' }}"),
+                type: "{{ vital.vital_type }}",
+                value: {{ vital.value }},
+                unit: "{{ vital.unit|default:'' }}",
+                status: "{{ vital.status|default:'' }}"
+            },
+            {% endfor %}
+        ];
+
+        let filteredData = [...allVitalsData];
+        let currentPage = 1;
+        const rowsPerPage = 10;
+
+        const vitalsTableBody = document.getElementById('vitalsTableBody');
+        const searchInput = document.getElementById('searchInput');
+        const typeFilter = document.getElementById('typeFilter');
+        const statusFilter = document.getElementById('statusFilter');
+        const prevPageButton = document.getElementById('prevPageButton');
+        const nextPageButton = document.getElementById('nextPageButton');
+        const pageInfo = document.getElementById('pageInfo');
+        const exportDataButton = document.getElementById('exportDataButton');
+
+        function renderTable(data) {
+            vitalsTableBody.innerHTML = ''; // Clear existing rows
+
+            if (data.length === 0) {
+                vitalsTableBody.innerHTML = '<tr><td colspan="5">No vital records found matching your filters.</td></tr>';
+                pageInfo.textContent = 'Page 0 of 0';
+                prevPageButton.disabled = true;
+                nextPageButton.disabled = true;
+                return;
+            }
+
+            const startIndex = (currentPage - 1) * rowsPerPage;
+            const endIndex = startIndex + rowsPerPage;
+            const paginatedData = data.slice(startIndex, endIndex);
+
+            paginatedData.forEach(row => {
+                const tr = document.createElement('tr');
+                tr.dataset.type = row.type;
+                tr.dataset.status = row.status;
+                tr.innerHTML = `
+                    <td>${row.timestamp.toLocaleDateString()} ${row.timestamp.toLocaleTimeString()}</td>
+                    <td>${row.type.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase())}</td>
+                    <td>${row.value}</td>
+                    <td>${row.unit || 'N/A'}</td>
+                    <td class="status-${row.status.toLowerCase()}">${row.status || 'N/A'}</td>
+                `;
+                vitalsTableBody.appendChild(tr);
+            });
+
+            updatePaginationControls(data.length);
+        }
+
+        function updatePaginationControls(totalRows) {
+            const totalPages = Math.ceil(totalRows / rowsPerPage);
+            pageInfo.textContent = `Page ${currentPage} of ${totalPages}`;
+            prevPageButton.disabled = currentPage === 1;
+            nextPageButton.disabled = currentPage === totalPages || totalPages === 0;
+        }
+
+        function filterTable() {
+            const search = searchInput.value.toLowerCase();
+            const type = typeFilter.value;
+            const status = statusFilter.value;
+
+            // Map dropdown values to data values
+            const typeMap = {
+                'temperature': ['temperature'],
+                'pulse_rate': ['pulse_rate', 'heart_rate'], // support both if your data uses either
+                'ecg': ['ecg']
+            };
+
+            filteredData = allVitalsData.filter(d =>
+                (d.type.toLowerCase().includes(search) || d.status.toLowerCase().includes(search) || d.timestamp.toLocaleDateString().includes(search) || d.timestamp.toLocaleTimeString().includes(search)) &&
+                (type === '' || (typeMap[type] ? typeMap[type].includes(d.type) : d.type === type)) &&
+                (status === '' || d.status === status)
+            );
+            currentPage = 1; // Reset to first page after filtering
+            renderTable(filteredData);
+        }
+
+        prevPageButton.addEventListener('click', () => {
+            if (currentPage > 1) {
+                currentPage--;
+                renderTable(filteredData);
+            }
+        });
+
+        nextPageButton.addEventListener('click', () => {
+            const totalPages = Math.ceil(filteredData.length / rowsPerPage);
+            if (currentPage < totalPages) {
+                currentPage++;
+                renderTable(filteredData);
+            }
+        });
+
+        exportDataButton.addEventListener('click', () => {
+            let csvContent = "data:text/csv;charset=utf-8,";
+            // Add header row
+            csvContent += "Date & Time,Vital Sign,Value,Unit,Status\\n";
+            // Add data rows
+            filteredData.forEach(row => {
+                csvContent += `${row.timestamp.toLocaleDateString()} ${row.timestamp.toLocaleTimeString()},${row.type},${row.value},${row.unit || ''},${row.status || ''}\\n`;
+            });
+
+            const encodedUri = encodeURI(csvContent);
+            const link = document.createElement("a");
+            link.setAttribute("href", encodedUri);
+            link.setAttribute("download", "vitals_history.csv");
+            document.body.appendChild(link); // Required for Firefox
+            link.click();
+            document.body.removeChild(link); // Clean up
+            alert('Vitals data exported to vitals_history.csv!');
+        });
+
+        // Initial render on page load
+        document.addEventListener('DOMContentLoaded', () => {
+            filterTable(); // Render table and chart with all data initially
+        });
+
+        document.addEventListener('DOMContentLoaded', function() {
+            const ctx = document.getElementById('vitalsChart').getContext('2d');
+            // Group data by type
+            const grouped = {};
+            chartVitalsData.forEach(v => {
+                if (!grouped[v.type]) grouped[v.type] = [];
+                grouped[v.type].push({ x: v.timestamp, y: v.value });
+            });
+            const colors = {
+                'ecg': 'rgba(41, 128, 185, 1)',
+                'temperature': 'rgba(231, 76, 60, 1)',
+                'pulse_rate': 'rgba(39, 174, 96, 1)',
+                'heart_rate': 'rgba(39, 174, 96, 1)'
+            };
+            const datasets = Object.keys(grouped).map(type => ({
+                label: type.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase()),
+                data: grouped[type],
+                borderColor: colors[type] || 'rgba(100,100,100,1)',
+                backgroundColor: (colors[type] || 'rgba(100,100,100,1)').replace('1)', '0.1)'),
+                fill: false,
+                tension: 0.2,
+                pointRadius: 2
+            }));
+            new Chart(ctx, {
+                type: 'line',
+                data: {
+                    datasets: datasets
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: { position: 'top' },
+                        title: { display: false }
+                    },
+                    scales: {
+                        x: {
+                            type: 'time',
+                            time: { unit: 'minute' },
+                            title: { display: true, text: 'Time' }
+                        },
+                        y: { beginAtZero: false }
+                    },
+                    animation: false
+                }
+            });
+        });
+    </script>
+</body>
+</html>

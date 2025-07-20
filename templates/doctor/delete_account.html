@@ -1,0 +1,21 @@
+{% load static %}
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Delete Account</title>
+    <link rel="stylesheet" href="{% static 'styles/settings_doctor.css' %}">
+</head>
+<body>
+    <div class="main-content">
+        <h1>Delete Account</h1>
+        <form method="post" class="settings-section" style="max-width: 400px; margin: 0 auto;">
+            {% csrf_token %}
+            <p style="color: #e74c3c; font-weight: 600;">Are you sure you want to delete your account? This action cannot be undone.</p>
+            <label for="confirm_password">Enter your password to confirm:</label>
+            <input type="password" id="confirm_password" name="confirm_password" required>
+            <button type="submit" class="delete-button">Delete Account</button>
+            <a href="{% url 'doctor_settings' %}" class="action-button">Cancel</a>
+        </form>
+    </div>
+</body>
+</html> 

@@ -1,0 +1,45 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Doctor Details - MediDash Admin</title>
+    <link rel="stylesheet" href="{% static 'styles/patient.css' %}">
+</head>
+<body>
+    <div class="header">
+        <header class="header-container">
+            <div class="logoside">
+                <img src="{% static 'images/logo.png' %}" alt="logo" loading="lazy">
+            </div>
+            <div class="main-nav" id="navMenu">
+                <a href="{% url 'admin_dashboard' %}">Home</a>
+                <a href="{% url 'admin_view_records' %}" class="active">Records</a>
+                <a href="{% url 'admin_notifications' %}">Notifications</a>
+                <a href="{% url 'admin_settings' %}">Settings</a>
+            </div>
+            <div class="rightside">
+                <span class="badge">{{ unread_notifications_count }}</span>
+                <img src="{{ profile_pic_url }}" alt="Profile Picture" class="profile-pic">
+                <span class="admin-name">{{ username }}</span>
+            </div>
+        </header>
+    </div>
+    <div class="main-container">
+        <h1>Doctor Details</h1>
+        <div class="doctor-card">
+            {% if doctor.profile_picture and doctor.profile_picture.url %}
+                <img src="{{ doctor.profile_picture.url }}" alt="Doctor Profile" class="doctor-pic">
+            {% else %}
+                <img src="https://placehold.co/80x80/f0f4f7/556080?text=DR" alt="Doctor Profile" class="doctor-pic">
+            {% endif %}
+            <div class="doctor-name">{{ doctor.user.first_name }} {{ doctor.user.last_name }}</div>
+            <div class="doctor-info">Specialty: {{ doctor.specialty|default:'N/A' }}</div>
+            <div class="doctor-info">Contact: {{ doctor.contact_number|default:'N/A' }}</div>
+            <div class="doctor-info">Email: {{ doctor.user.email|default:'N/A' }}</div>
+            <div class="doctor-info">Status: {{ doctor.status|default:'N/A' }}</div>
+        </div>
+    </div>
+</body>
+</html> 

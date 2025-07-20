@@ -1,0 +1,20 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Edit Doctor - MediDash Admin</title>
+    <link rel="stylesheet" href="{% static 'styles/patient.css' %}">
+</head>
+<body>
+    <div class="main-container">
+        <h1>Edit Doctor</h1>
+        <form method="post" enctype="multipart/form-data" class="admin-edit-form">
+            {% csrf_token %}
+            {{ form.as_p }}
+            <button type="submit" class="action-button">Save Changes</button>
+        </form>
+    </div>
+</body>
+</html> 

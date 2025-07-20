@@ -1,0 +1,119 @@
+{% load static %}
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Message {{ patient.first_name }}</title>
+    <link rel="stylesheet" href="{% static 'styles/doctor.css' %}">
+</head>
+<body>
+    <div class="main-content">
+        <h2>Chat with {{ patient.first_name }} {{ patient.last_name }}</h2>
+        <div class="chat-box">
+            <div class="message-list" style="max-height: 300px; overflow-y: auto;">
+                {% for msg in messages %}
+                    <div class="message {% if msg.sender == request.user %}sent{% else %}received{% endif %}">
+                        <div style="font-size:0.95em; color:#888; margin-bottom:2px;">
+                            {% if msg.sender == request.user %}You{% else %}{{ patient.first_name }}{% endif %} - {{ msg.timestamp|date:"M d, Y H:i" }}
+                        </div>
+                        {{ msg.text|linebreaksbr }}
+                    </div>
+                {% empty %}
+                    <div style="color:#888;">No messages yet. Start the conversation!</div>
+                {% endfor %}
+            </div>
+            <form id="chat-form" method="post" style="margin-top:18px;">
+                {% csrf_token %}
+                <textarea id="chat-message-input" name="message" rows="2" placeholder="Type your message..." required></textarea>
+                <button type="submit">Send</button>
+            </form>
+        </div>
+        <a href="{% url 'doctor_patients_list' %}" class="button" style="margin-top:20px;">Back to Patients</a>
+    </div>
+    <div class="logoside">
+        <img src="{% static 'innerimg/logo.png' %}" alt="logo" loading="lazy">
+    </div>
+    <style>
+        .chat-box {
+            background: #fff;
+            border-radius: 10px;
+            box-shadow: 0 2px 8px rgba(52,152,219,0.07);
+            padding: 24px;
+            margin-top: 18px;
+            width: 100%;
+            max-width: 600px;
+        }
+        .message-list {
+            min-height: 120px;
+            margin-bottom: 18px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        .message {
+            padding: 8px 14px;
+            border-radius: 8px;
+            max-width: 70%;
+            word-break: break-word;
+        }
+        .sent {
+            background: #eaf4fb;
+            align-self: flex-end;
+            margin-left: auto;
+        }
+        .received {
+            background: #f7fafc;
+            align-self: flex-start;
+            margin-right: auto;
+        }
+        textarea {
+            width: 100%;
+            border-radius: 6px;
+            border: 1px solid #d1e3f0;
+            padding: 8px;
+            margin-bottom: 8px;
+        }
+        button[type="submit"] {
+            background: #3498db;
+            color: #fff;
+            border: none;
+            border-radius: 6px;
+            padding: 8px 22px;
+            font-weight: 600;
+        }
+        button[type="submit"]:hover {
+            background: #217dbb;
+        }
+    </style>
+    <script>
+    const roomName = "{{ request.user.id }}_{{ patient.id }}";
+    const chatSocket = new WebSocket(
+        'ws://' + window.location.host + '/ws/chat/' + roomName + '/'
+    );
+
+    chatSocket.onmessage = function(e) {
+        const data = JSON.parse(e.data);
+        const messageList = document.querySelector('.message-list');
+        const msgDiv = document.createElement('div');
+        msgDiv.className = 'message ' + (data.sender === "{{ request.user.first_name }}" ? 'sent' : 'received');
+        msgDiv.innerHTML = `<div style="font-size:0.95em; color:#888; margin-bottom:2px;">${data.sender}</div>${data.message}`;
+        messageList.appendChild(msgDiv);
+        messageList.scrollTop = messageList.scrollHeight;
+    };
+
+    chatSocket.onclose = function(e) {
+        console.error('Chat socket closed unexpectedly');
+    };
+
+    document.querySelector('#chat-form').onsubmit = function(e) {
+        e.preventDefault();
+        const messageInputDom = document.querySelector('#chat-message-input');
+        const message = messageInputDom.value;
+        chatSocket.send(JSON.stringify({
+            'message': message,
+            'sender': "{{ request.user.first_name }}"
+        }));
+        messageInputDom.value = '';
+    };
+    </script>
+</body>
+</html> 

@@ -1,0 +1,206 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Doctor Settings - MediDash</title>
+    <link rel="stylesheet" href="{% static 'styles/settings_doctor.css' %}">
+</head>
+<body>
+    <!-- Header Nav bar Profile -->
+    <div class="header">
+       <header class="header-container">
+        <div class="logoside">
+            <img src="{% static 'innerimg/logo.png' %}" alt="logo" loading="lazy">
+        </div>
+        <div class="main-nav" id="navMenu">
+            <a href="{% url 'doctor_dashboard' %}" id="home-a" >Home</a>
+            <a href="{% url 'doctor_patients_list' %}" id="patient-a" >Patients</a>
+            <a href="{% url 'doctor_alerts' %}" id="alert-a" >Alerts</a>
+            <a href="{% url 'doctor_reports' %}" id="reports-a" >Reports</a>
+            <a href="{% url 'doctor_settings' %}" id="setting-a" class="active">Settings</a>
+        </div>
+        <div class="rightside">
+            <a href="{% url 'doctor_notifications' %}" class="m-notification">🔔 </a>
+            <span class="badge">{{ unread_notifications_count }}</span>
+            <a href="{% url 'doctor_notifications' %}" class="notification">Notifications 🔔</a>
+            <a href="{% url 'logout' %}" id="logout-a">Logout</a>
+            <button type="button" class="menu-button" onclick="toggleMenu()">
+                <img src="{{ profile_pic_url }}" alt="Profile Picture" class="profile-pic">
+            </button>
+            <span class="doctor-name">{{ request.user.first_name }} {{ request.user.last_name }}</span>
+        </div>
+       </header>
+    </div>
+
+    <div class="main-content">
+        <h1>Doctor Settings</h1>
+        <div class="settings-grid">
+            <!-- Profile Settings -->
+            <div class="settings-section profile-section">
+                <h2>Profile Information</h2>
+                <form id="profileSettingsForm" method="POST" enctype="multipart/form-data" action="{% url 'doctor_settings' %}">
+                    {% csrf_token %}
+                    {{ doctor_update_form.as_p }}
+                    <button type="submit" class="save-button" name="update_profile">Save Profile</button>
+                </form>
+            </div>
+
+            <!-- Customization Settings -->
+            <div class="settings-section customization-section">
+                <h2>Customization & Preferences</h2>
+                <form id="customizationSettingsForm" method="POST" action="{% url 'doctor_settings' %}">
+                    {% csrf_token %}
+                    <div class="form-group">
+                        <label for="languagesSpoken">Languages Spoken (comma-separated):</label>
+                        <input type="text" id="languagesSpoken" name="languages_spoken" value="{{ doctor_profile.languages_spoken|join:', '|default:'' }}" placeholder="e.g., English, Spanish, Hindi">
+                    </div>
+                    <div class="form-group">
+                        <label for="clinicFacilities">Clinic Facilities (comma-separated):</label>
+                        <input type="text" id="clinicFacilities" name="clinic_facilities" value="{{ doctor_profile.clinic_facilities|join:', '|default:'' }}" placeholder="e.g., X-ray, Pharmacy, Lab">
+                    </div>
+                    <div class="form-group">
+                        <label for="themePreference">Theme Preference:</label>
+                        <select id="themePreference" name="theme_preference">
+                            <option value="light" {% if doctor_profile.theme_preference == 'light' %}selected{% endif %}>Light</option>
+                            <option value="dark" {% if doctor_profile.theme_preference == 'dark' %}selected{% endif %}>Dark</option>
+                        </select>
+                    </div>
+                    <button type="submit" class="save-button">Save Customization</button>
+                </form>
+            </div>
+
+            <!-- Notification Settings -->
+            <div class="settings-section notification-section">
+                <h2>Notification Preferences</h2>
+                <form id="notificationSettingsForm" method="POST" action="{% url 'doctor_settings' %}">
+                    {% csrf_token %}
+                    <div class="form-group switch-group">
+                        <label for="notificationEnabled">Enable All Notifications:</label>
+                        <label class="switch">
+                            <input type="checkbox" id="notificationEnabled" name="notification_enabled" {% if doctor_profile.notification_enabled %}checked{% endif %}>
+                            <span class="slider round"></span>
+                        </label>
+                    </div>
+                    <!-- More granular notification settings could go here -->
+                    <button type="submit" class="save-button">Save Notifications</button>
+                </form>
+            </div>
+
+            <!-- Report & Data Preferences -->
+            <div class="settings-section report-data-section">
+                <h2>Report & Data Preferences</h2>
+                <form id="reportDataSettingsForm" method="POST" action="{% url 'doctor_settings' %}">
+                    {% csrf_token %}
+                    <div class="form-group">
+                        <label for="dateFormat">Default Date Format:</label>
+                        <select id="dateFormat" name="date_format">
+                            <option value="YYYY-MM-DD" {% if doctor_profile.date_format == 'YYYY-MM-DD' %}selected{% endif %}>YYYY-MM-DD</option>
+                            <option value="DD-MM-YYYY" {% if doctor_profile.date_format == 'DD-MM-YYYY' %}selected{% endif %}>DD-MM-YYYY</option>
+                            <option value="MM/DD/YYYY" {% if doctor_profile.date_format == 'MM/DD/YYYY' %}selected{% endif %}>MM/DD/YYYY</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="timeFormat">Default Time Format:</label>
+                        <select id="timeFormat" name="time_format">
+                            <option value="HH:MM" {% if doctor_profile.time_format == 'HH:MM' %}selected{% endif %}>HH:MM (24-hour)</option>
+                            <option value="hh:mm A" {% if doctor_profile.time_format == 'hh:mm A' %}selected{% endif %}>hh:mm A (12-hour)</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="defaultReportTemplate">Default Report Template:</label>
+                        <textarea id="defaultReportTemplate" name="default_report_template" rows="5" placeholder="Enter default report template text">{{ doctor_profile.default_report_template|default:'' }}</textarea>
+                    </div>
+                    <button type="submit" class="save-button">Save Report Preferences</button>
+                </form>
+            </div>
+
+            <!-- Account Management -->
+            <div class="settings-section account-management-section">
+                <h2>Account Management</h2>
+                <a href="{% url 'doctor_change_password' %}" class="action-button">Change Password</a>
+                <a href="{% url 'doctor_enable_2fa' %}" class="action-button">Enable 2FA</a>
+                <a href="{% url 'doctor_delete_account' %}" class="delete-button">Delete Account</a>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // JavaScript for mobile menu toggle (consistent with doctor.html)
+        function toggleMenu() {
+            const nav = document.getElementById('navMenu');
+            const home = document.getElementById('home-a');
+            const patient = document.getElementById('patient-a');
+            const Alert = document.getElementById('alert-a');
+            const reports = document.getElementById('reports-a');
+            const setting = document.getElementById('setting-a');
+
+            if (window.innerWidth <= 986) {
+                nav.classList.toggle('show');
+                home.classList.toggle('show1');
+                patient.classList.toggle('show2');
+                Alert.classList.toggle('show3');
+                reports.classList.toggle('show4');
+                setting.classList.toggle('show5');
+
+                if (nav.classList.contains('show')) {
+                    nav.style.display = 'flex';
+                    void nav.offsetWidth;
+                } else {
+                    nav.addEventListener('transitionend', () => {
+                        nav.style.display = 'none';
+                    }, { once: true });
+                }
+            }
+        }
+
+        function handleResize() {
+            const nav = document.getElementById('navMenu');
+            const home = document.getElementById('home-a');
+            const patient = document.getElementById('patient-a');
+            const Alert = document.getElementById('alert-a');
+            const reports = document.getElementById('reports-a');
+            const setting = document.getElementById('setting-a');
+
+            if (window.innerWidth > 986) {
+                nav.classList.remove('show');
+                nav.style.display = 'flex';
+                home.classList.remove('show1');
+                home.style.display = 'flex';
+                patient.classList.remove('show2');
+                patient.style.display = 'flex';
+                Alert.classList.remove('show3');
+                Alert.style.display = 'flex';
+                reports.classList.remove('show4');
+                reports.style.display = 'flex';
+                setting.classList.remove('show5');
+                setting.style.display = 'flex';
+            } else {
+                nav.style.display = nav.classList.contains('show') ? 'flex' : 'none';
+                home.style.display = home.classList.contains('show1') ? 'flex' : 'none';
+                patient.style.display = patient.classList.contains('show2') ? 'flex' : 'none';
+                Alert.style.display = Alert.classList.contains('show3') ? 'flex' : 'none';
+                reports.style.display = reports.classList.contains('show4') ? 'flex' : 'none';
+                setting.style.display = setting.classList.contains('show5') ? 'flex' : 'none';
+            }
+        }
+        window.addEventListener('resize', handleResize);
+        window.addEventListener('DOMContentLoaded', handleResize);
+
+        // Update profile picture preview when URL changes
+        const profilePictureUrlInput = document.getElementById('profilePictureUrl');
+        const profilePicturePreview = document.getElementById('profilePicturePreview');
+
+        if (profilePictureUrlInput && profilePicturePreview) {
+            profilePictureUrlInput.addEventListener('input', () => {
+                profilePicturePreview.src = profilePictureUrlInput.value;
+                profilePicturePreview.onerror = () => {
+                    // Fallback to a placeholder if the provided URL fails to load
+                    profilePicturePreview.src = "https://placehold.co/40x40/f0f4f7/556080?text=DR";
+                };
+            });
+        }
+    </script>
+</body>
+</html>

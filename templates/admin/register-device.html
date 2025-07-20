@@ -1,0 +1,154 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Register Device</title>
+    <link rel="stylesheet" href="{% static 'styles/register-user.css' %}">
+</head>
+<body>
+    <div class="header">
+       <header class="header-container">
+        <div class="logoside">
+            <img src="{% static 'innerimg/logo.png' %}" alt="logo" loading="lazy">
+        </div>
+        <div class="main-nav" id="navMenu">
+            <a href="{% url 'admin_dashboard' %}" Id="home-a" >Home</a>
+            <a href="{% url 'admin_register_user' %}" id="patient-a">Register Users</a>
+            <a href="{% url 'admin_register_device' %}" id="device-a" class="active">Register Device</a>
+            <a href="{% url 'admin_view_records' %}" id="alert-a">View Records</a>
+            <a href="{% url 'admin_settings' %}" id="setting-a">Settings</a>
+        </div>
+        <div class="rightside">
+            <a href="{% url 'admin_notifications' %}" class="notification">Notifications 🔔</a>
+            <a href="{% url 'logout' %}" id="logout-a">Logout</a>
+            <a href="{% url 'admin_notifications' %}" class="m-notification">🔔 </a><span class="badge">{{ unread_notifications_count }}</span>
+            <button type="button" class="menu-button" onclick="toggleMenu()"><img src="{% static 'images/hamburger-menu-more.svg' %}" alt="menu-icon" class="menu-icon"></button>
+        </div>
+        </header>
+    </div>
+
+    <div class="main-container">
+      <main class="form-container">
+        <div class="form-wrapper">
+            {# Display Django messages if any #}
+            {% if messages %}
+                <ul class="messages" style="display:none;">
+                    {% for message in messages %}
+                        <li{% if message.tags %} class="{{ message.tags }}" data-title="{{ message.tags|capfirst }}" data-message="{{ message }}"{% endif %}>{{ message }}</li>
+                    {% endfor %}
+                </ul>
+            {% endif %}
+
+            <div id="device-form" class="form-section active">
+                <h2>Register New Device</h2>
+                <!-- <form action="{% url 'admin_register_device' %}" method="post">
+                    {% csrf_token %} {# Django security token for forms #}
+                    {{ form.as_p }} {# Renders form fields automatically as paragraphs #}
+                    <button type="submit" class="submit-btn" id="submitDeviceBtn">Register Device</button>
+                </form> -->
+                <form action="{% url 'admin_register_device' %}" method="post">
+                    {% csrf_token %}
+                    {% for field in form %}
+                        <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+                        {{ field }}
+                        {% if field.help_text %}
+                            <small>{{ field.help_text }}</small>
+                        {% endif %}
+                        {% for error in field.errors %}
+                            <span style="color: red;">{{ error }}</span>
+                        {% endfor %}
+                    {% endfor %}
+                    <button type="submit" class="submit-btn" id="submitDeviceBtn">Register Device</button>
+                </form>
+            </div>
+        </div>
+      </main>
+    </div>
+
+    <div id="custom-message-overlay" style="display:none;">
+        <div class="message-box">
+            <span class="close-btn">&times;</span>
+            <h3 id="message-title"></h3>
+            <div id="message-content"></div>
+        </div>
+    </div>
+
+    <script>
+        const nav = document.getElementById('navMenu');
+        const home = document.getElementById('home-a');
+        const patient = document.getElementById('patient-a');
+        const device = document.getElementById('device-a');
+        const Alert = document.getElementById('alert-a');
+        const setting = document.getElementById('setting-a');
+        const toggleBtn = document.querySelector('.menu-button');
+
+        function toggleMenu() {
+          if (window.innerWidth <= 986) {
+            nav.classList.toggle('show');
+            home.classList.toggle('show1');
+            patient.classList.toggle('show2');
+            device.classList.toggle('showDevice');
+            Alert.classList.toggle('show3');
+            setting.classList.toggle('show5');
+
+            if (nav.classList.contains('show')) {
+              nav.style.display = 'flex';
+              void nav.offsetWidth;
+            } else {
+              nav.addEventListener('transitionend', () => {
+                nav.style.display = 'none';
+              }, { once: true });
+            }
+          }
+        }
+
+        function handleResize() {
+          if (window.innerWidth > 986) {
+            nav.classList.remove('show');
+            nav.style.display = 'flex';
+            home.classList.remove('show1');
+            home.style.display = 'flex';
+            patient.classList.remove('show2');
+            patient.style.display = 'flex';
+            device.classList.remove('showDevice');
+            device.style.display = 'flex';
+            Alert.classList.remove('show3');
+            Alert.style.display = 'flex';
+            setting.classList.remove('show5');
+            setting.style.display = 'flex';
+          } else {
+            nav.style.display = nav.classList.contains('show') ? 'flex' : 'none';
+          }
+        }
+
+        window.addEventListener('resize', handleResize);
+        window.addEventListener('DOMContentLoaded', handleResize);
+
+        // Pop-up message logic
+        document.addEventListener('DOMContentLoaded', function() {
+            var messageOverlay = document.getElementById('custom-message-overlay');
+            var messageTitle = document.getElementById('message-title');
+            var messageContent = document.getElementById('message-content');
+            var closeBtn = document.querySelector('.close-btn');
+            var messageLi = document.querySelector('.messages li');
+            if (messageLi) {
+                messageTitle.textContent = messageLi.getAttribute('data-title') || 'Message';
+                messageContent.textContent = messageLi.getAttribute('data-message') || messageLi.textContent;
+                messageOverlay.style.display = 'block';
+                setTimeout(function() {
+                    messageOverlay.style.display = 'none';
+                }, 3500);
+            }
+            if (closeBtn) {
+                closeBtn.onclick = function() {
+                    messageOverlay.style.display = 'none';
+                };
+            }
+        });
+
+        // Removed image preview logic as device image is no longer needed
+    </script>
+</body>
+</html>

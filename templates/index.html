@@ -1,0 +1,60 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="{% static 'styles/login.css' %}">
+    <title>Health Monitoring System</title>
+</head>
+<body>
+    <!-- Message Overlay HTML -->
+    <div id="custom-message-overlay">
+        <div class="message-box">
+            <span class="close-btn">&times;</span>
+            <h3 id="message-title"></h3>
+            <div id="message-content"></div>
+        </div>
+    </div>
+    <div class="main-container">
+        <div class="logobox">
+             <img src="{% static 'innerimg/logo.png' %}" alt="logo" class="logo-img"> 
+        </div>
+
+        <div class="formbox">
+            <h2>Sign In</h2>
+            <!-- Django Message Display (will be processed by JS and hidden) -->
+    {% if messages %}
+        <ul class="messages">
+            {% for message in messages %}
+                <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
+            {% endfor %}
+        </ul>
+    {% endif %}
+           <form action="{% url 'login' %}" method="post">
+            {% csrf_token %} <!-- Django's CSRF token for security -->
+            <input type="text" name="username" placeholder="Username" required> <!-- Ensure name="username" -->
+            <input type="password" name="password" placeholder="Password" required> <!-- Ensure name="password" -->
+            <button type="submit">Sign In</button>
+           </form>
+           <p class="footer">Forget Password <a href="{% url 'forget_password' %}" id="forget-password-link">Change</a></p>
+        
+        </div>
+    </div>
+
+    {% if form.password.errors %}
+                    <ul class="errorlist">{% for error in form.password.errors %}<li>{{ error }}</li>{% endfor %}</ul>
+                {% endif %}
+            </div>
+            
+            {% if form.non_field_errors %}
+                <ul class="errorlist">{% for error in form.non_field_errors %}<li>{{ error }}</li>{% endfor %}</ul>
+            {% endif %}
+
+    <script>
+        document.getElementById('forget-password-link').addEventListener('click', function(event) {
+            alert('You will now be redirected to the password reset page.');
+        });
+    </script>
+</body>
+</html>

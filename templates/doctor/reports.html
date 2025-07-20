@@ -1,0 +1,457 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Medical Reports - MediDash Doctor</title>
+    <link rel="stylesheet" href="{% static 'styles/reports.css' %}">
+</head>
+<body>
+    <!-- Header Nav bar Profile -->
+    <div class="header">
+       <header class="header-container">
+        <div class="logoside">
+            <img src="{% static 'innerimg/logo.png' %}" alt="logo" loading="lazy">
+        </div>
+        <div class="main-nav" id="navMenu">
+            <a href="{% url 'doctor_dashboard' %}" id="home-a" >Home</a>
+            <a href="{% url 'doctor_patients_list' %}" id="patient-a" >Patients</a>
+            <a href="{% url 'doctor_alerts' %}" id="alert-a" >Alerts</a>
+            <a href="{% url 'doctor_reports' %}" id="reports-a" class="active">Reports</a>
+            <a href="{% url 'doctor_settings' %}" id="setting-a">Settings</a>
+        </div>
+        <div class="rightside">
+            <a href="{% url 'doctor_notifications' %}" class="notification">Notifications 🔔</a>
+            <a href="{% url 'logout' %}" id="logout-a">Logout</a>
+            <a href="{% url 'doctor_notifications' %}" class="m-notification">🔔 </a>
+            <span class="badge">{{ unread_notifications_count }}</span>
+            <button type="button" class="menu-button" onclick="toggleMenu()">
+                <img src="{{ profile_pic_url }}" alt="Profile Picture" class="profile-pic">
+            </button>
+            <span class="doctor-name">{{ request.user.first_name }} {{ request.user.last_name }}</span>
+        </div>
+       </header>
+    </div>
+
+    <div class="main-content">
+        <h1>Medical Reports</h1>
+        <div class="report-controls" style="display: flex; gap: 18px; margin-bottom: 32px;">
+            <button class="action-button" id="showCreateBtn" onclick="showSection('create-report', this)">Create New Report</button>
+            <button class="action-button" id="showViewBtn" onclick="showSection('view-reports', this)">View All Reports</button>
+        </div>
+        <div id="create-report-section" class="content-section" style="display: none;">
+            <h2>Create New Patient Report</h2>
+            <form id="reportForm" class="report-form" method="POST">
+                {% csrf_token %}
+                <div class="form-group">
+                    <label for="patientSelector">Select Patient:</label>
+                    <select id="patientSelector" name="patient_id" required>
+                        <option value="">-- Select a Patient --</option>
+                        {% for patient in patients %}
+                            <option value="{{ patient.user.id }}">{{ patient.user.first_name }} {{ patient.user.last_name }} (ID: {{ patient.user.id }})</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="reportTitle">Report Title:</label>
+                    <input type="text" id="reportTitle" name="title" value="Patient Medical Report - {{ report_date }}" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="doctorName">Doctor's Name:</label>
+                    <input type="text" id="doctorName" name="doctorName" value="{{ request.user.first_name }} {{ request.user.last_name }}" readonly>
+                </div>
+
+                <div class="form-group">
+                    <label for="reportDate">Report Date:</label>
+                    <input type="date" id="reportDate" name="reportDate" value="{{ today_date|date:'Y-m-d' }}" readonly>
+                </div>
+
+                <div class="form-group">
+                    <label for="chiefComplaint">Chief Complaint:</label>
+                    <textarea id="chiefComplaint" name="chiefComplaint" rows="4"></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label for="diagnosis">Diagnosis:</label>
+                    <textarea id="diagnosis" name="diagnosis" rows="6"></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label for="treatmentPlan">Treatment Plan:</label>
+                    <textarea id="treatmentPlan" name="treatmentPlan" rows="6"></textarea>
+                </div>
+                
+                <div class="form-group">
+                    <label for="notes">Additional Notes:</label>
+                    <textarea id="notes" name="notes" rows="4"></textarea>
+                </div>
+
+                <div class="form-actions">
+                    <button type="submit" class="save-button">Generate Report</button>
+                    <button type="button" class="cancel-button" onclick="resetForm()">Clear Form</button>
+                </div>
+            </form>
+        </div>
+        <div id="view-reports-section" class="content-section" style="display: none;">
+            <h2>All Generated Reports</h2>
+            <div class="filters">
+                <input type="text" id="reportSearchInput" placeholder="Search by patient name or report title..." onkeyup="filterReports()">
+                <select id="reportFilterPatient" onchange="filterReports()">
+                    <option value="">All Patients</option>
+                    {% for patient in patients %}
+                        <option value="{{ patient.user.id }}">{{ patient.user.first_name }} {{ patient.user.last_name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="report-list">
+                {% for report in reports %}
+                <div class="report-card" data-report-id="{{ report.id }}" data-patient-id="{{ report.patient.user.id }}">
+                    <h3>{{ report.title }}</h3>
+                    <p><strong>Patient:</strong> {{ report.patient.user.first_name }} {{ report.patient.user.last_name }}</p>
+                    <p><strong>Date:</strong> {{ report.report_date|date:"M d, Y" }}</p>
+                    <p><strong>Chief Complaint:</strong> {{ report.chief_complaint|truncatechars:100|default:"N/A" }}</p>
+                    <div class="report-card-actions">
+                        <button class="action-button view-report-btn" data-report-id="{{ report.id }}">View Full Report</button>
+                        <button class="action-button print-report-btn" data-report-id="{{ report.id }}">Print</button>
+                        <button class="action-button delete-report-btn" data-report-id="{{ report.id }}">Delete</button>
+                    </div>
+                </div>
+                {% empty %}
+                <p>No reports generated yet.</p>
+                {% endfor %}
+            </div>
+        </div>
+
+        <!-- Modal for Full Report View -->
+        <div id="reportModal" class="modal">
+            <div class="modal-content">
+                <!-- <span class="close-button">&times;</span> -->
+                <div id="modalReportContent">
+                    <!-- Report details will be loaded here -->
+                </div>
+                <button class="action-button print-button" id="modalPrintButton" style="display: none;">Print Report</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // JavaScript for mobile menu toggle (consistent with doctor.html)
+        function toggleMenu() {
+            const nav = document.getElementById('navMenu');
+            const home = document.getElementById('home-a');
+            const patient = document.getElementById('patient-a');
+            const Alert = document.getElementById('alert-a');
+            const reports = document.getElementById('reports-a');
+            const setting = document.getElementById('setting-a');
+
+            if (window.innerWidth <= 986) {
+                nav.classList.toggle('show');
+                home.classList.toggle('show1');
+                patient.classList.toggle('show2');
+                Alert.classList.toggle('show3');
+                reports.classList.toggle('show4');
+                setting.classList.toggle('show5');
+
+                if (nav.classList.contains('show')) {
+                    nav.style.display = 'flex';
+                    void nav.offsetWidth;
+                } else {
+                    nav.addEventListener('transitionend', () => {
+                        nav.style.display = 'none';
+                    }, { once: true });
+                }
+            }
+        }
+
+        // Handle resize event to adjust menu display (consistent with doctor.html)
+        function handleResize() {
+            const nav = document.getElementById('navMenu');
+            const home = document.getElementById('home-a');
+            const patient = document.getElementById('patient-a');
+            const Alert = document.getElementById('alert-a');
+            const reports = document.getElementById('reports-a');
+            const setting = document.getElementById('setting-a');
+
+            if (window.innerWidth > 986) {
+                nav.classList.remove('show');
+                nav.style.display = 'flex';
+                home.classList.remove('show1');
+                home.style.display = 'flex';
+                patient.classList.remove('show2');
+                patient.style.display = 'flex';
+                Alert.classList.remove('show3');
+                Alert.style.display = 'flex';
+                reports.classList.remove('show4');
+                reports.style.display = 'flex';
+                setting.classList.remove('show5');
+                setting.style.display = 'flex';
+            } else {
+                nav.style.display = nav.classList.contains('show') ? 'flex' : 'none';
+                home.style.display = home.classList.contains('show1') ? 'flex' : 'none';
+                patient.style.display = patient.classList.contains('show2') ? 'flex' : 'none';
+                Alert.style.display = Alert.classList.contains('show3') ? 'flex' : 'none';
+                reports.style.display = reports.classList.contains('show4') ? 'flex' : 'none';
+                setting.style.display = setting.classList.contains('show5') ? 'flex' : 'none';
+            }
+        }
+        window.addEventListener('resize', handleResize);
+        window.addEventListener('DOMContentLoaded', handleResize);
+
+        // JavaScript for tab switching
+        function showSection(sectionId, button) {
+            document.querySelectorAll('.content-section').forEach(section => {
+                section.classList.remove('active');
+            });
+            document.querySelectorAll('.report-controls .action-button').forEach(btn => {
+                btn.classList.remove('active');
+            });
+
+            document.getElementById(sectionId + '-section').classList.add('active');
+            button.classList.add('active');
+            
+            // If switching to view reports, re-filter
+            if (sectionId === 'view-reports') {
+                filterReports();
+            }
+        }
+
+        // --- Data from Django context ---
+        const allReportsData = [
+            {% for report in reports %}
+            {
+                id: {{ report.id }},
+                patient_id: {{ report.patient.user.id }},
+                patient_name: "{{ report.patient.user.first_name }} {{ report.patient.user.last_name }}",
+                title: "{{ report.title|escapejs }}",
+                report_date: "{{ report.report_date|date:'Y-m-d' }}",
+                chief_complaint: "{{ report.chief_complaint|escapejs }}",
+                diagnosis: "{{ report.diagnosis|escapejs }}",
+                treatment_plan: "{{ report.treatment_plan|escapejs }}",
+                notes: "{{ report.notes|escapejs }}"
+            },
+            {% endfor %}
+        ];
+
+        // Form elements for Create Report
+        const reportForm = document.getElementById('reportForm');
+        const patientSelector = document.getElementById('patientSelector');
+        const reportTitleInput = document.getElementById('reportTitle');
+        const doctorNameInput = document.getElementById('doctorName'); // Readonly, populated by Django context
+        const reportDateInput = document.getElementById('reportDate'); // Readonly, populated by Django context
+        const chiefComplaintInput = document.getElementById('chiefComplaint');
+        const diagnosisInput = document.getElementById('diagnosis');
+        const treatmentPlanInput = document.getElementById('treatmentPlan');
+        const notesInput = document.getElementById('notes');
+
+        // Elements for View Reports
+        const reportSearchInput = document.getElementById('reportSearchInput');
+        const reportFilterPatient = document.getElementById('reportFilterPatient');
+        const reportListDiv = document.querySelector('#view-reports-section .report-list');
+
+        // Modal elements
+        const reportModal = document.getElementById('reportModal');
+        const modalReportContent = document.getElementById('modalReportContent');
+        const closeModalButton = document.querySelector('.close-button');
+        const modalPrintButton = document.getElementById('modalPrintButton');
+
+        // Set today's date for new report form
+        const today = new Date();
+        reportDateInput.value = today.toISOString().split('T')[0];
+
+
+        function resetForm() {
+            reportForm.reset();
+            // Reset readonly fields if they were manually changed (though they shouldn't be)
+            reportTitleInput.value = "Patient Medical Report - " + new Date().toLocaleDateString('en-CA'); // YYYY-MM-DD format
+            reportDateInput.value = today.toISOString().split('T')[0];
+        }
+
+        function renderReports(filtered = allReportsData) {
+            reportListDiv.innerHTML = ''; // Clear existing cards
+
+            if (filtered.length === 0) {
+                reportListDiv.innerHTML = '<p>No reports found matching your criteria.</p>';
+                return;
+            }
+
+            filtered.forEach(report => {
+                const reportCard = document.createElement('div');
+                reportCard.classList.add('report-card');
+                reportCard.dataset.reportId = report.id;
+                reportCard.dataset.patientId = report.patient_id;
+
+                reportCard.innerHTML = `
+                    <h3>${report.title}</h3>
+                    <p><strong>Patient:</strong> ${report.patient_name}</p>
+                    <p><strong>Date:</strong> ${new Date(report.report_date).toLocaleDateString()}</p>
+                    <p><strong>Chief Complaint:</strong> ${report.chief_complaint.substring(0, 100)}${report.chief_complaint.length > 100 ? '...' : ''}</p>
+                    <div class="report-card-actions">
+                        <button class="action-button view-report-btn" data-report-id="${report.id}">View Full Report</button>
+                        <button class="action-button print-report-btn" data-report-id="${report.id}">Print</button>
+                        <button class="action-button delete-report-btn" data-report-id="${report.id}">Delete</button>
+                    </div>
+                `;
+                reportListDiv.appendChild(reportCard);
+            });
+            addReportActionListeners(); // Re-attach listeners after rendering
+        }
+
+        function filterReports() {
+            const searchTerm = reportSearchInput.value.toLowerCase();
+            const patientFilterId = reportFilterPatient.value;
+
+            const filtered = allReportsData.filter(report => {
+                const matchesSearch = report.patient_name.toLowerCase().includes(searchTerm) ||
+                                      report.title.toLowerCase().includes(searchTerm);
+                const matchesPatient = patientFilterId === '' || report.patient_id.toString() === patientFilterId;
+                return matchesSearch && matchesPatient;
+            });
+            renderReports(filtered);
+        }
+
+        function showFullReport(reportId) {
+            const report = allReportsData.find(r => r.id === reportId);
+            if (report) {
+                modalReportContent.innerHTML = `
+                    <h2>${report.title}</h2>
+                    <p><strong>Patient:</strong> ${report.patient_name}</p>
+                    <p><strong>Doctor:</strong> ${doctorNameInput.value}</p>
+                    <p><strong>Report Date:</strong> ${new Date(report.report_date).toLocaleDateString()}</p>
+                    <hr>
+                    <h4>Chief Complaint:</h4>
+                    <p>${report.chief_complaint || 'N/A'}</p>
+                    <h4>Diagnosis:</h4>
+                    <p>${report.diagnosis || 'N/A'}</p>
+                    <h4>Treatment Plan:</h4>
+                    <p>${report.treatment_plan || 'N/A'}</p>
+                    <h4>Additional Notes:</h4>
+                    <p>${report.notes || 'N/A'}</p>
+                `;
+                modalPrintButton.dataset.reportId = reportId; // Set ID for print button
+                reportModal.style.display = 'block';
+            }
+        }
+
+        function addReportActionListeners() {
+            document.querySelectorAll('.view-report-btn').forEach(button => {
+                button.addEventListener('click', (event) => {
+                    const reportId = parseInt(event.target.dataset.reportId);
+                    showFullReport(reportId);
+                });
+            });
+
+            document.querySelectorAll('.print-report-btn').forEach(button => {
+                button.addEventListener('click', (event) => {
+                    const reportId = parseInt(event.target.dataset.reportId);
+                    const reportToPrint = allReportsData.find(r => r.id === reportId);
+                    if (reportToPrint) {
+                        printContent(reportToPrint);
+                    }
+                });
+            });
+
+            document.querySelectorAll('.delete-report-btn').forEach(button => {
+                button.addEventListener('click', (event) => {
+                    const reportId = parseInt(event.target.dataset.reportId);
+                    if (confirm('Are you sure you want to delete this report?')) {
+                        deleteReport(reportId);
+                    }
+                });
+            });
+        }
+
+        function printContent(report) {
+            const printWindow = window.open('', '', 'height=600,width=800');
+            printWindow.document.write('<html><head><title>Print Report</title>');
+            printWindow.document.write('<style>');
+            printWindow.document.write('body { font-family: Arial, sans-serif; margin: 20px; }');
+            printWindow.document.write('h2, h4 { color: #333; }');
+            printWindow.document.write('p { line-height: 1.6; margin-bottom: 10px; }');
+            printWindow.document.write('strong { font-weight: bold; }');
+            printWindow.document.write('hr { border: 0; border-top: 1px solid #eee; margin: 20px 0; }');
+            printWindow.document.write('</style>');
+            printWindow.document.write('</head><body>');
+            printWindow.document.write(`<h2>${report.title}</h2>`);
+            printWindow.document.write(`<p><strong>Patient:</strong> ${report.patient_name}</p>`);
+            printWindow.document.write(`<p><strong>Doctor:</strong> ${doctorNameInput.value}</p>`);
+            printWindow.document.write(`<p><strong>Report Date:</strong> ${new Date(report.report_date).toLocaleDateString()}</p>`);
+            printWindow.document.write('<hr>');
+            printWindow.document.write('<h4>Chief Complaint:</h4>');
+            printWindow.document.write(`<p>${report.chief_complaint || 'N/A'}</p>`);
+            printWindow.document.write('<h4>Diagnosis:</h4>');
+            printWindow.document.write(`<p>${report.diagnosis || 'N/A'}</p>`);
+            printWindow.document.write('<h4>Treatment Plan:</h4>');
+            printWindow.document.write(`<p>${report.treatment_plan || 'N/A'}</p>`);
+            printWindow.document.write('<h4>Additional Notes:</h4>');
+            printWindow.document.write(`<p>${report.notes || 'N/A'}</p>`);
+            printWindow.document.write('</body></html>');
+            printWindow.document.close();
+            printWindow.focus();
+            printWindow.print();
+            printWindow.close();
+        }
+
+        function deleteReport(reportId) {
+            // In a real Django app, this would send an AJAX POST request to delete the report
+            alert(`Deleting report with ID: ${reportId} (Simulated deletion - requires backend logic)`);
+            // Remove from local data and re-render
+            const index = allReportsData.findIndex(r => r.id === reportId);
+            if (index > -1) {
+                allReportsData.splice(index, 1);
+            }
+            filterReports(); // Re-render to reflect deletion
+        }
+
+        // Modal event listeners
+        if (closeModalButton) {
+            closeModalButton.addEventListener('click', () => {
+                reportModal.style.display = 'none';
+            });
+        }
+
+        if (modalPrintButton) {
+            modalPrintButton.addEventListener('click', (event) => {
+                const reportId = parseInt(event.target.dataset.reportId);
+                const reportToPrint = allReportsData.find(r => r.id === reportId);
+                if (reportToPrint) {
+                    printContent(reportToPrint);
+                }
+            });
+        }
+
+        window.addEventListener('click', (event) => {
+            if (event.target == reportModal) {
+                reportModal.style.display = 'none';
+            }
+        });
+
+
+        // Initial render on page load
+        document.addEventListener('DOMContentLoaded', () => {
+            renderReports(allReportsData); // Render all reports initially
+            // Ensure "View All Reports" is the active button on load
+            const initialViewReportsBtn = document.querySelector('.report-controls button:nth-child(2)');
+            if (initialViewReportsBtn) {
+                initialViewReportsBtn.classList.add('active');
+            }
+            // On page load, show only the buttons, hide both sections and print button
+            document.getElementById('create-report-section').style.display = 'none';
+            document.getElementById('view-reports-section').style.display = 'none';
+            document.getElementById('modalPrintButton').style.display = 'none';
+            document.getElementById('showCreateBtn').addEventListener('click', function() {
+                document.getElementById('create-report-section').style.display = 'block';
+                document.getElementById('view-reports-section').style.display = 'none';
+                document.getElementById('modalPrintButton').style.display = 'inline-block';
+            });
+            document.getElementById('showViewBtn').addEventListener('click', function() {
+                document.getElementById('view-reports-section').style.display = 'block';
+                document.getElementById('create-report-section').style.display = 'none';
+                document.getElementById('modalPrintButton').style.display = 'inline-block';
+            });
+        });
+    </script>
+</body>
+</html>

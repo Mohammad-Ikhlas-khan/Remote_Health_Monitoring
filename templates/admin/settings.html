@@ -1,0 +1,199 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Settings - MediDash</title>
+    <link rel="stylesheet" href="{% static 'styles/settings.css' %}">
+</head>
+<body>
+    <!-- Header Nav bar Profile -->
+    <div class="header">
+       <header class="header-container">
+        <div class="logoside">
+            <img src="{% static 'innerimg/logo.png' %}" alt="logo" loading="lazy">
+        </div>
+        <div class="main-nav" id="navMenu">
+            <a href="{% url 'admin_dashboard' %}" id="home-a" >Home</a>
+            <a href="{% url 'admin_register_user' %}" id="patient-a">Register Users</a>
+            <a href="{% url 'admin_view_records' %}" id="alert-a">View Records</a>
+            <a href="{% url 'admin_register_device' %}" id="device-a">Register Device</a>
+            <a href="{% url 'admin_settings' %}" id="setting-a" class="active">Settings</a>
+        </div>
+        <div class="rightside">
+            <a href="{% url 'admin_notifications' %}" class="notification">Notifications 🔔</a>
+            <a href="{% url 'logout' %}" id="logout-a">Logout</a>
+            <a href="{% url 'admin_notifications' %}" class="m-notification">🔔 </a>
+            <span class="badge">{{ unread_notifications_count }}</span>
+            <button type="button" class="menu-button" onclick="toggleMenu()">
+                <img src="https://placehold.co/40x40/f0f4f7/556080?text=AD" alt="Profile Picture" class="profile-pic">
+            </button>
+            <span class="doctor-name">{{ request.user.first_name }} {{ request.user.last_name }}</span>
+        </div>
+       </header>
+    </div>
+
+    <div class="main-content">
+        <h1>Admin Settings</h1>
+        <div class="settings-grid">
+            <!-- User Profile Section (Minimal for Admin) -->
+            <div class="settings-section profile-section">
+                <h2>Admin Profile</h2>
+                <div class="profile-card">
+                    <div class="profile-avatar">AD</div>
+                    <div class="profile-details">
+                        <b>Name:</b> {{ request.user.first_name }} {{ request.user.last_name }}<br>
+                        <b>Username:</b> {{ request.user.username }}<br>
+                        <b>Email:</b> {{ request.user.email }}<br>
+                        <b>Role:</b> {{ request.user.role|capfirst }}<br>
+                        <button class="action-btn" id="editProfileBtn">Edit Profile (Admin)</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- General Settings -->
+            <div class="settings-section general-settings-section">
+                <h2>General Settings</h2>
+                <form action="{% url 'admin_settings' %}" method="POST">
+                    {% csrf_token %}
+                    {{ site_settings_form.as_p }}
+                    <button type="submit" name="update_site_settings" class="save-button">Save General Settings</button>
+                </form>
+            </div>
+
+            <!-- Security Settings -->
+            <div class="settings-section security-section">
+                <h2>Security Settings</h2>
+                <form action="{% url 'admin_settings' %}" method="POST" style="margin-bottom: 1rem;">
+                    {% csrf_token %}
+                    {{ security_form.as_p }}
+                    <button type="submit" name="update_security" class="action-btn">Change Password</button>
+                </form>
+                <form action="{% url 'admin_settings' %}" method="POST" style="margin-bottom: 1rem;">
+                    {% csrf_token %}
+                    <input type="hidden" name="update_notifications" value="1">
+                    <label for="id_two_factor_authentication_enabled">Enable Two-Factor Authentication:</label>
+                    {{ notification_settings_form.two_factor_authentication_enabled }}
+                    <button type="submit" name="save_2fa" class="action-btn primary">Save 2FA Setting</button>
+                </form>
+                <form action="{% url 'admin_settings' %}" method="POST" onsubmit="return confirm('Are you sure you want to delete this admin account? This action cannot be undone.');">
+                    {% csrf_token %}
+                    <button type="submit" name="delete_account" class="action-btn danger">Delete Admin Account</button>
+                </form>
+            </div>
+
+            <!-- Notification Preferences -->
+            <div class="settings-section notification-section">
+                <h2>Notification Preferences</h2>
+                <form action="{% url 'admin_settings' %}" method="POST">
+                    {% csrf_token %}
+                    {{ notification_settings_form.email_notifications_enabled.label_tag }}
+                    {{ notification_settings_form.email_notifications_enabled }}
+                    {{ notification_settings_form.sms_notifications_enabled.label_tag }}
+                    {{ notification_settings_form.sms_notifications_enabled }}
+                    <button type="submit" name="update_notifications" class="save-button">Save Notification Preferences</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Edit Profile Modal -->
+    <div id="editProfileModal" class="modal" style="display:none; position:fixed; top:0; left:0; width:100vw; height:100vh; background:rgba(0,0,0,0.18); z-index:1000; align-items:center; justify-content:center;">
+      <div class="modal-content" style="background:#fff; border-radius:14px; box-shadow:0 4px 24px rgba(44,62,80,0.13); padding:2.2rem 2.5rem 1.5rem 2.5rem; max-width:420px; margin:auto; position:relative;">
+        <span id="closeEditProfileModal" style="position:absolute; top:18px; right:22px; font-size:1.7rem; color:#888; cursor:pointer;">&times;</span>
+        <h2>Edit Admin Profile</h2>
+        <form method="POST" enctype="multipart/form-data" action="" style="margin-top:1.2rem;">
+          {% csrf_token %}
+          <input type="hidden" name="update_profile" value="1">
+          <label for="id_full_name">Full Name:</label>
+          <input type="text" name="full_name" id="id_full_name" value="{{ request.user.first_name }} {{ request.user.last_name }}" required>
+          <label for="id_middle_name">Middle Name:</label>
+          <input type="text" name="middle_name" id="id_middle_name" value="{{ request.user.middle_name|default:'' }}">
+          <label for="id_email">Email Address:</label>
+          <input type="email" name="email" id="id_email" value="{{ request.user.email }}" required>
+          <label for="id_profile_pic">Profile Picture:</label>
+          <input type="file" name="profile_pic" id="id_profile_pic">
+          <button type="submit" class="action-btn primary" style="margin-top:1.2rem;">Save Changes</button>
+        </form>
+        </div>
+    </div>
+
+    <script>
+        // JavaScript for mobile menu toggle (same as admin-panel.html)
+        function toggleMenu() {
+            const nav = document.getElementById('navMenu');
+            const home = document.getElementById('home-a');
+            const patient = document.getElementById('patient-a');
+            const Alert = document.getElementById('alert-a');
+            const device = document.getElementById('device-a');
+            const setting = document.getElementById('setting-a');
+
+            if (window.innerWidth <= 986) {
+                nav.classList.toggle('show');
+                home.classList.toggle('show1');
+                patient.classList.toggle('show2');
+                Alert.classList.toggle('show3');
+                device.classList.toggle('showDevice');
+                setting.classList.toggle('show5');
+
+                if (nav.classList.contains('show')) {
+                    nav.style.display = 'flex';
+                    void nav.offsetWidth;
+                } else {
+                    nav.addEventListener('transitionend', () => {
+                        nav.style.display = 'none';
+                    }, { once: true });
+                }
+            }
+        }
+
+        function handleResize() {
+            const nav = document.getElementById('navMenu');
+            const home = document.getElementById('home-a');
+            const patient = document.getElementById('patient-a');
+            const Alert = document.getElementById('alert-a');
+            const device = document.getElementById('device-a');
+            const setting = document.getElementById('setting-a');
+
+            if (window.innerWidth > 986) {
+                nav.classList.remove('show');
+                nav.style.display = 'flex';
+                home.classList.remove('show1');
+                home.style.display = 'flex';
+                patient.classList.remove('show2');
+                patient.style.display = 'flex';
+                Alert.classList.remove('show3');
+                Alert.style.display = 'flex';
+                device.classList.remove('showDevice');
+                device.style.display = 'flex';
+                setting.classList.remove('show5');
+                setting.style.display = 'flex';
+            } else {
+                nav.style.display = nav.classList.contains('show') ? 'flex' : 'none';
+                home.style.display = home.classList.contains('show1') ? 'flex' : 'none';
+                patient.style.display = patient.classList.contains('show2') ? 'flex' : 'none';
+                Alert.style.display = Alert.classList.contains('show3') ? 'flex' : 'none';
+                device.style.display = device.classList.contains('showDevice') ? 'flex' : 'none';
+                setting.style.display = setting.classList.contains('show5') ? 'flex' : 'none';
+            }
+        }
+        window.addEventListener('resize', handleResize);
+        window.addEventListener('DOMContentLoaded', handleResize);
+
+        // Remove old alert for edit button and use modal logic
+        document.getElementById('editProfileBtn').onclick = function() {
+            document.getElementById('editProfileModal').style.display = 'flex';
+        };
+        document.getElementById('closeEditProfileModal').onclick = function() {
+            document.getElementById('editProfileModal').style.display = 'none';
+        };
+        window.onclick = function(event) {
+            var modal = document.getElementById('editProfileModal');
+            if (event.target == modal) {
+                modal.style.display = 'none';
+            }
+        };
+    </script>
+</body>
+</html>

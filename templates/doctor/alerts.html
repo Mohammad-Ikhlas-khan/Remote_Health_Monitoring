@@ -1,0 +1,348 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Doctor Alerts - MediDash</title>
+    <link rel="stylesheet" href="{% static 'styles/alerts.css' %}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+</head>
+<body>
+    <div class="header">
+        <header class="header-container">
+        <div class="logoside">
+            <img src="{% static 'innerimg/logo.png' %}" alt="logo" loading="lazy">
+        </div>
+        <div class="main-nav" id="navMenu">
+            <a href="{% url 'doctor_dashboard' %}" id="home-a" >Home</a>
+            <a href="{% url 'doctor_patients_list' %}" id="patient-a">Patients</a>
+            <a href="{% url 'doctor_alerts' %}" id="alert-a" class="active">Alerts</a>
+            <a href="{% url 'doctor_reports' %}" id="reports-a">Reports</a>
+            <a href="{% url 'doctor_settings' %}" id="setting-a">Settings</a>
+        </div>
+        <div class="rightside">
+            <a href="{% url 'doctor_notifications' %}" class="notification">Notifications 🔔</a>
+            <a href="{% url 'logout' %}" id="logout-a">Logout</a>
+            <a href="{% url 'doctor_notifications' %}" class="m-notification">🔔 </a>
+            <span class="badge">{{ unread_notifications_count }}</span>
+            <button type="button" class="menu-button" onclick="toggleMenu()">
+                <img src="{{ profile_pic_url }}" alt="Profile Picture" class="profile-pic">
+            </button>
+            <span class="doctor-name">{{ request.user.first_name }} {{ request.user.last_name }}</span>
+        </div>
+       </header>
+    </div>
+
+    <div class="main-container">
+        <h1>Patient Alerts</h1>
+
+        <div class="alerts-overview">
+            <div class="overview-card">
+                <h3>Total Active Alerts</h3>
+                <p id="totalActiveAlerts">{{ alerts|length }}</p> <!-- Dynamic count from Django -->
+            </div>
+            <div class="overview-card">
+                <h3>High Severity Alerts</h3>
+                <p id="highSeverityAlerts">>{{ high_severity_alerts_count }}</p> <!-- Requires custom filter or view logic -->
+            </div>
+            <div class="overview-card">
+                <h3>Acknowledged Alerts Today</h3>
+                <p id="acknowledgedAlerts">0</p> <!-- Will be updated by JS or specific view logic -->
+            </div>
+        </div>
+
+        <div class="alert-filters">
+            <input type="text" id="alertSearchInput" placeholder="Search alerts..." onkeyup="filterAlerts()">
+            <select id="alertStatusFilter" onchange="filterAlerts()">
+                <option value="">All Statuses</option>
+                <option value="pending">Pending</option>
+                <option value="acknowledged">Acknowledged</option>
+                <option value="dismissed">Dismissed</option>
+            </select>
+            <select id="alertSeverityFilter" onchange="filterAlerts()">
+                <option value="">All Severities</option>
+                <option value="critical">Critical</option>
+                <option value="high">High</option>
+                <option value="medium">Medium</option>
+                <option value="low">Low</option>
+            </select>
+            <button class="action-button" id="applyFiltersBtn">Apply Filters</button>
+            <button class="action-button" id="resetFiltersBtn">Reset Filters</button>
+        </div>
+
+        <div class="alert-content">
+            <div class="alert-list-container">
+                <div class="alert-list" id="alertList">
+                    {% for alert in alerts %}
+                    <div class="alert-item {% if alert.status == 'pending' %}pending{% elif alert.status == 'acknowledged' %}acknowledged{% else %}dismissed{% endif %}" data-alert-id="{{ alert.id }}" data-status="{{ alert.status }}" data-severity="{{ alert.severity }}">
+                        <div class="alert-summary">
+                            <span class="icon fas fa-exclamation-triangle"></span>
+                            <span class="patient-name">{{ alert.patient.user.first_name }} {{ alert.patient.user.last_name }}</span>
+                            <span class="alert-message">{{ alert.message|truncatechars:50 }}</span>
+                            <span class="alert-time">{{ alert.timestamp|date:"H:i" }}</span>
+                        </div>
+                        <div class="alert-actions">
+                            {% if alert.status == 'pending' %}
+                                <button class="acknowledge-btn" data-alert-id="{{ alert.id }}">Acknowledge</button>
+                            {% else %}
+                                <button class="acknowledge-btn" data-alert-id="{{ alert.id }}" disabled>Acknowledged</button>
+                            {% endif %}
+                            <button class="dismiss-btn" data-alert-id="{{ alert.id }}">Dismiss</button>
+                        </div>
+                    </div>
+                    {% empty %}
+                    <p class="no-alerts">No alerts found.</p>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <div class="alert-detail-panel" id="alertDetailPanel">
+                <h2>Alert Details</h2>
+                <div id="detail-content">
+                    <p>Select an alert from the list to view its details.</p>
+                </div>
+                <div class="detail-actions" style="display: flex; gap: 16px; justify-content: center; margin-top: 24px;">
+                    <form id="alertActionForm" method="post" style="display:none;">
+                        {% csrf_token %}
+                        <input type="hidden" name="alert_id" id="formAlertId">
+                        <input type="hidden" name="action" id="formAction">
+                    </form>
+                    <button id="detail-acknowledge-btn" class="action-button" type="button">Acknowledge</button>
+                    <button id="detail-dismiss-btn" class="action-button" type="button">Dismiss</button>
+                    <button id="detail-assign-btn" class="action-button" type="button">Assign Task</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // JavaScript for mobile menu toggle (same as doctor.html)
+        function toggleMenu() {
+            const nav = document.getElementById('navMenu');
+            const home = document.getElementById('home-a');
+            const patient = document.getElementById('patient-a');
+            const Alert = document.getElementById('alert-a');
+            const reports = document.getElementById('reports-a');
+            const setting = document.getElementById('setting-a');
+
+            if (window.innerWidth <= 986) {
+                nav.classList.toggle('show');
+                home.classList.toggle('show1');
+                patient.classList.toggle('show2');
+                Alert.classList.toggle('show3');
+                reports.classList.toggle('show4');
+                setting.classList.toggle('show5');
+
+                if (nav.classList.contains('show')) {
+                    nav.style.display = 'flex';
+                    void nav.offsetWidth;
+                } else {
+                    nav.addEventListener('transitionend', () => {
+                        nav.style.display = 'none';
+                    }, { once: true });
+                }
+            }
+        }
+
+        function handleResize() {
+            const nav = document.getElementById('navMenu');
+            const home = document.getElementById('home-a');
+            const patient = document.getElementById('patient-a');
+            const Alert = document.getElementById('alert-a');
+            const reports = document.getElementById('reports-a');
+            const setting = document.getElementById('setting-a');
+
+            if (window.innerWidth > 986) {
+                nav.classList.remove('show');
+                nav.style.display = 'flex';
+                home.classList.remove('show1');
+                home.style.display = 'flex';
+                patient.classList.remove('show2');
+                patient.style.display = 'flex';
+                Alert.classList.remove('show3');
+                Alert.style.display = 'flex';
+                reports.classList.remove('show4');
+                reports.style.display = 'flex';
+                setting.classList.remove('show5');
+                setting.style.display = 'flex';
+            } else {
+                nav.style.display = nav.classList.contains('show') ? 'flex' : 'none';
+                home.style.display = home.classList.contains('show1') ? 'flex' : 'none';
+                patient.style.display = patient.classList.contains('show2') ? 'flex' : 'none';
+                Alert.style.display = Alert.classList.contains('show3') ? 'flex' : 'none';
+                reports.style.display = reports.classList.contains('show4') ? 'flex' : 'none';
+                setting.style.display = setting.classList.contains('show5') ? 'flex' : 'none';
+            }
+        }
+        window.addEventListener('resize', handleResize);
+        window.addEventListener('DOMContentLoaded', handleResize);
+
+
+        // DYNAMIC JAVASCRIPT LOGIC FOR ALERTS (ADAPTED FOR DJANGO)
+        const alertsData = [
+            {% for alert in alerts %}
+            {
+                id: {{ alert.id }},
+                patient: "{{ alert.patient.user.first_name }} {{ alert.patient.user.last_name }}",
+                patient_id: {{ alert.patient.user.id }},
+                message: "{{ alert.message|escapejs }}",
+                timestamp: "{{ alert.timestamp|date:'M d, Y H:i' }}",
+                status: "{{ alert.status }}",
+                severity: "{{ alert.severity }}"
+            },
+            {% endfor %}
+        ];
+
+        let filteredAlertsData = [...alertsData];
+        let selectedAlertId = null;
+
+        const alertListContainer = document.getElementById('alertList');
+        const alertDetailPanel = document.getElementById('alertDetailPanel');
+        const detailContent = document.getElementById('detail-content');
+        const totalActiveAlertsSpan = document.getElementById('totalActiveAlerts');
+        const highSeverityAlertsSpan = document.getElementById('highSeverityAlerts');
+        const acknowledgedAlertsSpan = document.getElementById('acknowledgedAlerts');
+
+        const alertSearchInput = document.getElementById('alertSearchInput');
+        const alertStatusFilter = document.getElementById('alertStatusFilter');
+        const alertSeverityFilter = document.getElementById('alertSeverityFilter');
+        const applyFiltersBtn = document.getElementById('applyFiltersBtn');
+        const resetFiltersBtn = document.getElementById('resetFiltersBtn');
+
+        const detailAcknowledgeBtn = document.getElementById('detail-acknowledge-btn');
+        const detailDismissBtn = document.getElementById('detail-dismiss-btn');
+        const detailAssignBtn = document.getElementById('detail-assign-btn');
+
+
+        function renderAlerts() {
+            alertListContainer.innerHTML = '';
+            if (filteredAlertsData.length === 0) {
+                alertListContainer.innerHTML = '<p class="no-alerts">No alerts found with current filters.</p>';
+                return;
+            }
+
+            filteredAlertsData.forEach(alert => {
+                const alertItem = document.createElement('div');
+                alertItem.classList.add('alert-item');
+                if (alert.status === 'pending') {
+                    alertItem.classList.add('pending');
+                } else if (alert.status === 'acknowledged') {
+                    alertItem.classList.add('acknowledged');
+                } else {
+                    alertItem.classList.add('dismissed');
+                }
+                alertItem.dataset.alertId = alert.id;
+                alertItem.dataset.status = alert.status;
+                alertItem.dataset.severity = alert.severity;
+
+                alertItem.innerHTML = `
+                    <div class="alert-summary">
+                        <span class="icon fas fa-exclamation-triangle"></span>
+                        <span class="patient-name">${alert.patient}</span>
+                        <span class="alert-message">${alert.message.substring(0, 50)}${alert.message.length > 50 ? '...' : ''}</span>
+                        <span class="alert-time">${alert.timestamp}</span>
+                    </div>
+                    <div class="alert-actions">
+                        <button class="acknowledge-btn" data-alert-id="${alert.id}" ${alert.status === 'acknowledged' ? 'disabled' : ''}>${alert.status === 'acknowledged' ? 'Acknowledged' : 'Acknowledge'}</button>
+                        <button class="dismiss-btn" data-alert-id="${alert.id}">Dismiss</button>
+                    </div>
+                `;
+                alertListContainer.appendChild(alertItem);
+            });
+            updateOverviewCards();
+            addAlertItemEventListeners(); // Re-attach listeners after rendering
+        }
+
+        function updateOverviewCards() {
+            const activeAlerts = alertsData.filter(alert => alert.status === 'pending').length;
+            const highSeverityAlerts = alertsData.filter(alert => alert.severity === 'high' || alert.severity === 'critical').length;
+            const acknowledgedAlertsToday = alertsData.filter(alert => {
+                const today = new Date().toDateString();
+                const alertDate = new Date(alert.timestamp).toDateString();
+                return alert.status === 'acknowledged' && alertDate === today;
+            }).length;
+
+            if (totalActiveAlertsSpan) totalActiveAlertsSpan.textContent = activeAlerts;
+            if (highSeverityAlertsSpan) highSeverityAlertsSpan.textContent = highSeverityAlerts;
+            if (acknowledgedAlertsSpan) acknowledgedAlertsSpan.textContent = acknowledgedAlertsToday;
+        }
+
+        function filterAlerts() {
+            const searchTerm = alertSearchInput.value.toLowerCase();
+            const statusFilter = alertStatusFilter.value;
+            const severityFilter = alertSeverityFilter.value;
+
+            filteredAlertsData = alertsData.filter(alert => {
+                const matchesSearch = alert.patient.toLowerCase().includes(searchTerm) ||
+                                      alert.message.toLowerCase().includes(searchTerm);
+                const matchesStatus = statusFilter === '' || alert.status === statusFilter;
+                const matchesSeverity = severityFilter === '' || alert.severity === severityFilter;
+                return matchesSearch && matchesStatus && matchesSeverity;
+            });
+            renderAlerts();
+        }
+
+        function resetFilters() {
+            alertSearchInput.value = '';
+            alertStatusFilter.value = '';
+            alertSeverityFilter.value = '';
+            filterAlerts(); // Re-apply filters with empty values
+        }
+
+        function selectAlert(alertId) {
+            selectedAlertId = alertId;
+            const selectedAlert = alertsData.find(alert => alert.id === alertId);
+
+            if (selectedAlert) {
+                detailContent.innerHTML = `
+                    <h3>Patient: <a href="{% url 'doctor_patient_detail' 0 %}".replace('/0/', '/'+selectedAlert.patient_id+'/')>${selectedAlert.patient}</a></h3>
+                    <p><strong>Message:</strong> ${selectedAlert.message}</p>
+                    <p><strong>Time:</strong> ${selectedAlert.timestamp}</p>
+                    <p><strong>Status:</strong> <span class="alert-status ${selectedAlert.status}">${selectedAlert.status.charAt(0).toUpperCase() + selectedAlert.status.slice(1)}</span></p>
+                    <p><strong>Severity:</strong> <span class="alert-severity ${selectedAlert.severity}">${selectedAlert.severity.charAt(0).toUpperCase() + selectedAlert.severity.slice(1)}</span></p>
+                `;
+                // Update action buttons based on selected alert's status
+                detailAcknowledgeBtn.dataset.alertId = alertId;
+                detailDismissBtn.dataset.alertId = alertId;
+                detailAssignBtn.dataset.alertId = alertId;
+
+                if (selectedAlert.status === 'acknowledged') {
+                    detailAcknowledgeBtn.disabled = true;
+                    detailAcknowledgeBtn.textContent = 'Acknowledged';
+                } else {
+                    detailAcknowledgeBtn.disabled = false;
+                    detailAcknowledgeBtn.textContent = 'Acknowledge';
+                }
+            } else {
+                detailContent.innerHTML = '<p>Select an alert from the list to view its details.</p>';
+                detailAcknowledgeBtn.disabled = true;
+                detailDismissBtn.disabled = true;
+                detailAssignBtn.disabled = true;
+            }
+        }
+
+        // Update submitAlertAction to use the hidden form
+        function submitAlertAction(alertId, action) {
+            document.getElementById('formAlertId').value = alertId;
+            document.getElementById('formAction').value = action;
+            document.getElementById('alertActionForm').submit();
+        }
+
+        // Event listeners for filter buttons
+        if (applyFiltersBtn) {
+            applyFiltersBtn.addEventListener('click', filterAlerts);
+        }
+        if (resetFiltersBtn) {
+            resetFiltersBtn.addEventListener('click', resetFilters);
+        }
+
+
+        // Initial render of alerts when the page loads
+        document.addEventListener('DOMContentLoaded', () => {
+            renderAlerts();
+            selectAlert(alertsData.length > 0 ? alertsData[0].id : null); // Select first alert or null
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,969 @@
+*{
+    padding: 0;
+    margin: 0;
+    box-sizing: border-box;
+}
+
+:root {
+  /* Base Colors */
+  --background-color: #f4f6f9;
+  --primary-color: #2980b9;
+  --secondary-color: #7f8c8d;
+  --button-color:#3498db;
+  --header-footer-color: #2c3e50;
+  --panel-bg-color: #34495e;
+  --alert-color: #e74c3c;
+  --box-background-color:white;
+  --normal-color:green;
+  /* Text Colors */
+  --text-primary: #2c3e50;
+  --text-secondary: #7f8c8d;
+  --text-on-dark: #ffffff;
+}
+
+.Critical{
+  color: var(--alert-color);
+  font-weight: bold;
+}
+.normal{
+  color: var(--normal-color);
+  font-weight: bold;
+}
+
+
+html body {
+    font-family: 'Roboto', sans-serif;
+    background: var(--box-background-color); /* Subtle gray background */
+}
+
+.header{
+      background-color: var(--header-footer-color);
+}
+.header-container{
+    display: flex;
+    flex-direction: row;
+    /* max-width: 1100px; */
+    justify-content: space-between;
+    align-items: center;
+    /* margin: 0 auto; */
+    /* padding: 2rem; */
+    margin-inline: 1.2rem;
+    color: white;
+    gap: 2rem;
+}
+
+.logoside{
+ width: 8.5%;
+  height:6rem;
+   animation: slideDown 0.9s ease-in-out;
+  animation-iteration-count: 1;
+  animation-fill-mode: forwards; 
+}
+.logoside img{
+    width: 100%;
+    height: 100%;
+    
+}
+
+.main-nav {
+    display: flex;
+    gap: 1.5rem;
+    animation: slideInFromTop 1s ease-out;
+}
+
+.main-nav a {
+    color: var(--text-on-dark);
+    text-decoration: none;
+    font-size: 1rem;
+    font-weight: 500;
+    padding: 0.6rem 1rem;
+    border-radius: 5px;
+    transition: all 0.3s ease;
+}
+
+.main-nav a:hover,
+.main-nav .active {
+    background-color: var(--primary-color);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 123, 255, 0.3);
+}
+
+#logout-a {
+    color: var(--text-on-dark);
+    text-decoration: none;
+    font-size: 1rem;
+    font-weight: 500;
+    padding: 0.6rem 1rem;
+    border-radius: 5px;
+    transition: all 0.3s ease;
+}
+#logout-a:hover {
+    background-color: var(--alert-color); /* Red for logout */
+    box-shadow: 0 4px 12px rgba(220, 53, 69, 0.3);
+    transform: translateY(-2px);
+}
+.rightside{
+    display: flex;
+    flex-direction: row;
+    flex-direction: center;
+    align-items: center;
+    gap: 0.98rem;
+    animation: slideDown 1.4s ease-in-out;
+  animation-iteration-count: 1;
+  animation-fill-mode: forwards;
+    /* text-decoration: none; */
+}
+.profile-name{
+    text-decoration: none;
+    color: var(--text-on-dark);
+    font-size: 1.1rem;
+    font-weight: 600;
+}
+.notification {
+    color: var(--text-on-dark);
+    font-size: 1rem;
+    font-weight: 500;
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    transition: all 0.3s ease;
+}
+/* .notification:hover {
+    color: var(--primary-color);
+    transform: scale(1.05);
+} */
+.m-notification , .badge{
+   display: none;
+}
+.notification img{
+    width: 1.3rem;
+    height: 1.3rem;
+}
+
+
+.menu-button{
+    border: none;
+    background: none;
+    display: none;
+}
+
+.menu-icon{
+    height:3.5rem;
+    width:3.5rem;
+}
+
+
+/*  Main container  */
+
+.main-container{
+  background-color: var(--background-color);
+    margin: 0 auto;
+    padding: 3rem;
+}
+/* .main-content{
+
+} */
+.main-header{
+  padding: 1rem;
+  font-size: 1.4rem;
+}
+.cards-container{
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1.2rem;
+    
+}
+
+#greeting {
+    font-size: 1.8rem;
+    color: var(--primary-color);
+    margin-bottom: 1.5rem;
+    text-align: center;
+    animation: slideInFromLeft 0.8s ease-out;
+}
+.data-card{
+  background-color: var(--box-background-color);
+  padding: 0.33rem;
+  border-radius: 0.5rem;
+  min-width: 200px;
+  max-width: 400px;
+  box-shadow: 0px 2px 8px  rgba(0, 0, 0, 0.1);
+  text-align: center;
+  font-size: 1.1rem; 
+  flex: 1;
+  min-width: 150px;
+  background: white;
+  transition: all 0.3s linear 0s;
+}
+.data-card:hover{
+  transform: scale(1.1);
+  cursor: pointer;
+}
+.no-info{
+  color: var(--primary-color);
+}
+.data-name{
+  font-size: 1.1rem;
+}
+
+.recent_activities{
+   margin: 0 auto ;
+   /* max-width: 700px; */
+   padding: 1.4rem;
+   background-color: white
+  }
+
+.activites-head {
+    font-size: 1.6rem;
+    color: var(--text-primary);
+    margin-bottom: 1.5rem;
+    border-bottom: 2px solid var(--background-color);
+    padding-bottom: 0.8rem;
+}
+
+.activities-feed {
+    list-style: none;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.activities-feed li {
+    background-color: #f8f9fa;
+    padding: 0.8rem 1.2rem;
+    border-radius: 5px;
+    border-left: 5px solid var(--secondary-color);
+    font-size: 0.95rem;
+    color: var(--text-primary);
+    box-shadow: 0 1px 5px rgba(0, 0, 0, 0.03);
+    transition: all 0.2s ease;
+}
+.activities-feed li:hover {
+    transform: translateX(5px);
+    border-left-color: var(--primary-color);
+}
+
+.activities-feed li span {
+    font-weight: 500;
+    color: var(--secondary-color);
+    margin-right: 0.5rem;
+}
+.activities-feed li strong {
+    color: var(--primary-color);
+}
+
+
+/* Animations */
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+@keyframes slideInFromTop {
+    from { transform: translateY(-30px); opacity: 0; }
+    to { transform: translateY(0); opacity: 1; }
+}
+
+@keyframes slideInFromLeft {
+    from { transform: translateX(-30px); opacity: 0; }
+    to { transform: translateX(0); opacity: 1; }
+}
+
+
+
+@media screen and (max-width:986px) {
+  .header{
+    /* position: fixed; */
+    width: 100%;
+  }
+   .header-container{
+        /* padding-inline: 0.8rem; */
+        padding-bottom: -5.3rem;
+        gap: 1.2rem;
+        justify-content: space-between;
+      }
+      .main-nav{
+        gap: 1.3rem;
+        display: none;
+      }
+
+      .notification, .profile{
+        display: none;
+      }
+
+      .m-notification{
+        /* display: block; */
+        /* width: 8rem;
+        height: 8rem; */
+        font-size: 1.4rem;
+        position: relative;
+        display: inline-block;
+      }
+       .badge{
+        position: absolute;
+        top: 8px;
+        right: 60px;
+        padding: 0.1px 4px;
+        border-radius: 50%;
+        background: red;
+        color: white;
+        display: block;
+      }
+
+        .menu-button{
+        display: block;
+        width: 4rem;
+        height: 3.5rem;
+    }
+    .menu-icon{
+      width: 100%;
+      height: 100%;
+    }
+
+    .logoside{
+      width: 5.2rem;
+      height: 5.2rem;
+      
+    }
+
+    .rightside{
+      gap: 0;
+    }
+    
+    .main-nav{
+        position: absolute;
+        top: 15%;
+        left: 0;
+        background-color: var(--panel-bg-color);
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        padding: 1rem;
+        flex-direction: column;
+        width: 100%;
+        display: none;
+        opacity: 0;
+        gap: 0.1rem;
+        text-align: center;
+    }
+    .main-nav a{
+    font-size: 0.95rem;
+    font-weight: 400;
+}
+
+    .main-nav.show{
+        display: flex;
+        opacity: 1;
+       animation: slidedown 0.4s ease--in-out;
+
+    }
+    #logout-a{
+        display: none;
+    }
+    #home-a.show1{
+       animation: slidedown 0.4s ease-in-out;
+    }
+    #patient-a.show2{
+       animation: slidedown 0.6s ease-in-out;
+    }
+    #alert-a.show3{
+       animation: slidedown 0.8s ease-in-out;
+    }
+    #reports-a.show4{
+       animation: slidedown 1s ease-out;
+    }
+    #setting-a.show5{
+       animation: slidedown 1.2s ease-in-out;
+    }
+    .main-header{
+      margin-top: 5rem;
+    }
+
+}
+
+@media screen and (max-width:500px){
+      
+     .logoside{
+      /* width: 0%; */
+      height: 4.5rem;
+    }
+    .badge{
+        position: absolute;
+        top: 8px;
+        right: 60px;
+        padding: 0.1px 4px;
+        border-radius: 50%;
+        background: red;
+        color: white;
+    
+      }
+      .main-nav{
+              top: 13%;
+              text-align: center;
+          }
+
+    
+    
+    }
+
+/* @keyframes bounce {
+  0%, 20%, 50%, 80%, 100% {
+    transform: translateY(0);
+  }
+  40% {
+    transform: translateY(-25px);
+  }
+  60% {
+    transform: translateY(-15px);
+  }
+} */
+
+/* @keyframes slideDown {
+  0% {
+    transform: translateY(-100px);
+    opacity: 0;
+  }
+  100% {
+    transform: translateY(0);
+    opacity: 1;
+  }
+} */
+
+@keyframes slideDown1 {
+  0% {
+    transform: translateY(0);
+    opacity: 0;
+  }
+  100% {
+    transform: translateY(20px);
+    opacity: 1;
+  }
+} 
+
+@keyframes slidedown {
+
+    0%{
+        opacity: 0;
+        transform: translateY(-20px) ;
+    }
+
+    100%{
+        opacity: 1;
+        transform: translateY(0);
+    }
+    
+}
+@keyframes fadein {
+
+    0%{
+        opacity: 0;
+        transform: translate(1px);
+    }
+
+    100%{
+        opacity: 1;
+        transform: translate(1px);
+    }
+}
+
+
+
+
+        /* --- Main Content Container --- */
+        .main-container {
+            background-color: var(--background-color);
+            padding: 1.5rem;
+            min-height: calc(100vh - 7rem);
+            padding-top: 7rem;
+        }
+        .main-content {
+            margin: 0 auto;
+            padding: 0;
+            max-width: 1200px;
+        }
+
+        /* Page Specific Styles for Messages */
+        .page-title {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: var(--primary-color);
+            margin-bottom: 2rem;
+            text-align: center;
+            padding: 1.5rem 0;
+            border-bottom: 2px solid var(--border-light);
+            animation: fadeIn 0.8s ease-out;
+        }
+
+        .messages-layout {
+            display: flex;
+            gap: 1.5rem;
+            height: calc(100vh - 7rem - 2rem - 2rem); /* Account for header, page title, and main container padding */
+            min-height: 500px; /* Minimum height for the message area */
+            flex-direction: column; /* Stack columns on small screens */
+        }
+        @media (min-width: 768px) {
+            .messages-layout {
+                flex-direction: row; /* Side-by-side on larger screens */
+            }
+        }
+
+        .messages-list-panel {
+            background-color: var(--box-background-color);
+            border-radius: 0.75rem;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
+            border: 1px solid var(--border-light);
+            flex-shrink: 0; /* Prevents shrinking */
+            overflow-y: auto; /* Scroll for messages list */
+            width: 100%; /* Full width on small screens */
+            max-height: 400px; /* Fixed height for scrollable list on small screens */
+        }
+        @media (min-width: 768px) {
+            .messages-list-panel {
+                width: 30%; /* Take 30% width on larger screens */
+                max-width: 350px; /* Max width for list */
+                max-height: none; /* No fixed height on larger screens */
+            }
+        }
+
+        .messages-list-header {
+            padding: 1rem 1.5rem;
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            border-bottom: 1px solid var(--border-light);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .compose-button {
+            padding: 0.5rem 1rem;
+            background-color: var(--button-color);
+            color: var(--text-on-dark);
+            border: none;
+            border-radius: 0.5rem;
+            font-size: 0.9rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.3s ease, transform 0.2s ease;
+        }
+        .compose-button:hover {
+            background-color: #2475aa;
+            transform: translateY(-2px);
+        }
+
+        .message-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+        .message-item {
+            padding: 1rem 1.5rem;
+            border-bottom: 1px solid var(--border-lighter);
+            cursor: pointer;
+            transition: background-color 0.2s ease;
+        }
+        .message-item:last-child {
+            border-bottom: none;
+        }
+        .message-item:hover {
+            background-color: var(--bg-light);
+        }
+        .message-item.unread {
+            background-color: #e0f2f7; /* Light blue for unread messages */
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+        .message-item.selected {
+            background-color: var(--primary-color);
+            color: var(--text-on-dark);
+        }
+        .message-item.selected .message-sender,
+        .message-item.selected .message-date {
+            color: var(--text-on-dark);
+        }
+
+
+        .message-item .message-sender {
+            font-size: 1rem;
+            font-weight: 600;
+            margin-bottom: 0.2rem;
+            color: var(--text-primary);
+        }
+        .message-item .message-subject {
+            font-size: 0.95rem;
+            color: var(--text-secondary);
+            overflow: hidden;
+            white-space: nowrap;
+            text-overflow: ellipsis;
+            max-width: 100%;
+            display: block;
+        }
+        .message-item .message-date {
+            font-size: 0.8rem;
+            color: #a0aec0;
+            margin-top: 0.4rem;
+            text-align: right;
+        }
+
+        .message-view-panel {
+            background-color: var(--box-background-color);
+            border-radius: 0.75rem;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
+            border: 2px solid #2980b9;
+            flex-grow: 1;
+            padding: 1.8rem;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-start;
+            min-height: 250px;
+            min-width: 320px;
+            overflow-y: auto;
+            margin-left: 1.5rem;
+        }
+
+        .message-body {
+            font-size: 1.08rem;
+            color: #223046;
+            background: #f7fafc;
+            border-radius: 0.5rem;
+            padding: 1.1rem 1.2rem;
+            margin-top: 1.2rem;
+            word-break: break-word;
+            box-shadow: 0 2px 8px rgba(34,48,70,0.07);
+        }
+
+        .message-view-panel .message-header {
+            border-bottom: 1px solid var(--border-lighter);
+            padding-bottom: 1rem;
+            margin-bottom: 1.5rem;
+        }
+        .message-view-panel .message-subject-full {
+            font-size: 1.6rem;
+            font-weight: 700;
+            color: var(--primary-color);
+            margin-bottom: 0.5rem;
+        }
+        .message-view-panel .message-meta {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+        }
+        .message-view-panel .message-content {
+            flex-grow: 1;
+            font-size: 1rem;
+            line-height: 1.7;
+            color: var(--text-primary);
+            margin-bottom: 1.5rem;
+            overflow-y: auto; /* Allow scrolling for long content */
+        }
+
+        .message-actions {
+            display: flex;
+            gap: 1rem;
+            margin-top: 1rem;
+            padding-top: 1rem;
+            border-top: 1px dashed var(--border-lighter);
+            flex-wrap: wrap;
+        }
+        .message-actions button {
+            padding: 0.6rem 1.2rem;
+            background-color: var(--button-color);
+            color: var(--text-on-dark);
+            border: none;
+            border-radius: 0.5rem;
+            font-size: 0.9rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.3s ease, transform 0.2s ease;
+        }
+        .message-actions button:hover {
+            background-color: #2475aa;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+        .message-actions button.delete-btn {
+            background-color: var(--alert-color);
+        }
+        .message-actions button.delete-btn:hover {
+            background-color: #c0392b;
+        }
+
+
+        .compose-message-panel {
+            background-color: var(--box-background-color);
+            padding: 1.8rem;
+            border-radius: 0.75rem;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
+            border: 1px solid var(--border-light);
+            margin-top: 1.5rem;
+            display: none; /* Hidden by default */
+            flex-direction: column;
+            gap: 1rem;
+        }
+        .compose-message-panel h3 {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--primary-color);
+            margin-bottom: 0.5rem;
+        }
+        .compose-message-panel label {
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 0.2rem;
+            display: block;
+        }
+        .compose-message-panel input[type="text"],
+        .compose-message-panel select,
+        .compose-message-panel textarea {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid var(--border-light);
+            border-radius: 0.5rem;
+            font-size: 1rem;
+            color: var(--text-primary);
+            background-color: white;
+            transition: border-color 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+        }
+        .compose-message-panel input[type="text"]:focus,
+        .compose-message-panel select:focus,
+        .compose-message-panel textarea:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 2px rgba(41, 128, 185, 0.2);
+            outline: none;
+        }
+        .compose-message-panel textarea {
+            min-height: 150px;
+            resize: vertical;
+        }
+        .compose-message-panel .compose-buttons {
+            display: flex;
+            gap: 1rem;
+            margin-top: 1rem;
+            justify-content: flex-end;
+        }
+        .compose-message-panel .compose-buttons button {
+            padding: 0.75rem 1.5rem;
+            background-color: var(--button-color);
+            color: var(--text-on-dark);
+            border: none;
+            border-radius: 0.5rem;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.3s ease, transform 0.2s ease;
+        }
+        .compose-message-panel .compose-buttons button:hover {
+            background-color: #2475aa;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+        .compose-message-panel .compose-buttons button.cancel-btn {
+            background-color: var(--secondary-color);
+        }
+        .compose-message-panel .compose-buttons button.cancel-btn:hover {
+            background-color: #6a7c7e;
+        }
+
+
+        /* Icon Colors */
+        .icon-messages { color: #f39c12; } /* Orange for messages */
+
+        /* Animations */
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        @keyframes slideInFromTop {
+            from { transform: translateY(-30px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+        @keyframes slideDown {
+            0% { transform: translateY(-100px); opacity: 0; }
+            100% { transform: translateY(0); opacity: 1; }
+        }
+        @keyframes slidedown-menu {
+            0% { opacity: 0; transform: translateY(-20px); max-height: 0; }
+            100% { opacity: 1; transform: translateY(0); max-height: 500px; }
+        }
+
+        /* --- Responsive Adjustments --- */
+        @media screen and (max-width:986px) {
+            .header-container {
+                padding-bottom: 0;
+                gap: 1.2rem;
+                margin-inline: 1rem;
+            }
+            .main-nav {
+                display: none;
+                position: absolute;
+                top: 100%;
+                left: 0;
+                background-color: var(--panel-bg-color);
+                box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+                padding: 1rem;
+                flex-direction: column;
+                width: 100%;
+                opacity: 0;
+                gap: 0.1rem;
+                transform: translateY(-20px);
+                transition: opacity 0.4s ease-in-out, transform 0.4s ease-in-out, max-height 0.4s ease-in-out;
+                max-height: 0;
+                overflow: hidden;
+            }
+            .main-nav.show {
+                display: flex;
+                opacity: 1;
+                transform: translateY(0);
+                animation: slidedown-menu 0.4s ease-in-out forwards;
+                max-height: 500px;
+            }
+            .main-nav ul {
+                flex-direction: column;
+                gap: 0.5rem;
+            }
+
+            .notification, .profile-name {
+                display: none;
+            }
+
+            .m-notification {
+                display: inline-block;
+                font-size: 1.4rem;
+                position: relative;
+            }
+            .badge {
+                position: absolute;
+                top: 5px;
+                right: -5px;
+                padding: 0.1px 6px;
+                border-radius: 50%;
+                background: var(--alert-color);
+                color: var(--text-on-dark);
+                display: block;
+                font-size: 0.7rem;
+            }
+
+            .menu-button {
+                display: block;
+                width: 3.5rem;
+                height: 3.5rem;
+            }
+            .menu-icon {
+                width: 100%;
+                height: 100%;
+            }
+
+            .logoside {
+                width: 4.5rem;
+                height: 4.5rem;
+            }
+
+            .rightside {
+                gap: 0.5rem;
+            }
+
+            .main-container {
+                padding-top: 6.5rem;
+            }
+            .page-title {
+                font-size: 2rem;
+            }
+            .messages-layout {
+                min-height: auto; /* Allow height to adjust */
+            }
+            .messages-list-panel, .message-view-panel {
+                padding: 1.5rem;
+            }
+            .messages-list-header {
+                font-size: 1.1rem;
+                padding: 0.8rem 1.2rem;
+            }
+            .compose-button {
+                padding: 0.4rem 0.8rem;
+                font-size: 0.8rem;
+            }
+            .message-item {
+                padding: 0.8rem 1.2rem;
+            }
+            .message-item .message-sender {
+                font-size: 0.9rem;
+            }
+            .message-item .message-subject {
+                font-size: 0.85rem;
+            }
+            .message-item .message-date {
+                font-size: 0.7rem;
+            }
+            .message-view-panel .message-subject-full {
+                font-size: 1.3rem;
+            }
+            .message-view-panel .message-content {
+                font-size: 0.9rem;
+            }
+            .message-actions button {
+                padding: 0.5rem 1rem;
+                font-size: 0.85rem;
+            }
+            .compose-message-panel h3 {
+                font-size: 1.3rem;
+            }
+            .compose-message-panel label {
+                font-size: 0.9rem;
+            }
+            .compose-message-panel input[type="text"],
+            .compose-message-panel select,
+            .compose-message-panel textarea {
+                padding: 0.6rem;
+                font-size: 0.9rem;
+            }
+            .compose-message-panel .compose-buttons button {
+                padding: 0.6rem 1.2rem;
+                font-size: 0.9rem;
+            }
+        }
+
+        @media screen and (max-width:500px){
+            .logoside {
+                height: 4rem;
+                width: 4rem;
+            }
+            .header-container {
+                gap: 1rem;
+                padding: 0.8rem 1rem;
+            }
+            .menu-button {
+                width: 3rem;
+                height: 3rem;
+            }
+            .menu-icon {
+                width: 100%;
+                height: 100%;
+            }
+            .badge {
+                top: 2px;
+                right: -8px;
+                padding: 0.5px 5px;
+                font-size: 0.6rem;
+            }
+            .page-title {
+                font-size: 1.7rem;
+            }
+        }
+
+.messages {
+  margin: 1.5rem auto 0 auto;
+  max-width: 700px;
+  text-align: center;
+}
+.alert {
+  padding: 1rem 1.5rem;
+  border-radius: 0.6rem;
+  margin-bottom: 1rem;
+  font-weight: 600;
+  background: #eaf6fb;
+  color: #2176ae;
+  box-shadow: 0 2px 8px rgba(41,128,185,0.08);
+}
+.alert.success, .alert-success { background: #e6f9ed; color: #218838; }
+.alert.error, .alert-danger { background: #fbeaea; color: #c82333; }

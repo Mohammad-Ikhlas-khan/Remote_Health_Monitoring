@@ -1,0 +1,20 @@
+{% load static %}
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Device Details</title>
+    <link rel="stylesheet" href="{% static 'styles/patient_doctor.css' %}">
+</head>
+<body>
+    <div class="patient-details-container">
+        <h1>Device Details</h1>
+        <p><strong>Device Name:</strong> {{ device.device_name }}</p>
+        <p><strong>Device Type:</strong> {{ device.device_type }}</p>
+        <p><strong>Serial Number:</strong> {{ device.serial_number }}</p>
+        <p><strong>Status:</strong> {% if device.is_active %}Active{% else %}Inactive{% endif %}</p>
+        <p><strong>Registered On:</strong> {{ device.registration_date }}</p>
+        <p><strong>Last Sync:</strong> {{ device.last_data_sync|default:'N/A' }}</p>
+        <a href="javascript:history.back()" class="action-button">Back</a>
+    </div>
+</body>
+</html> 
